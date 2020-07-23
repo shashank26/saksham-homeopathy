@@ -65,8 +65,8 @@ class ChatService {
     print(res);
   }
 
-  sendImage(bool isNewChat) async {
-    final images = await CImagePicker.getMessageImage(ImageSource.camera);
+  sendImage(bool isNewChat, ImageSource imageSource) async {
+    final images = await CImagePicker.getMessageImage(imageSource);
     if (images != null) {
       images.blurredFileName = ImagePath.imageMessagePath(_user.uid);
       images.fileName = ImagePath.imageMessagePath(_user.uid);
@@ -142,4 +142,9 @@ class ChatService {
       });
     }
   }
+
+  static Future postUpdate(String text) async {
+    await FirestoreCollection.postUpdate.add({'postImage' : null, 'postText' : text, 'timeStamp' : DateTime.now()});
+  }
+
 }

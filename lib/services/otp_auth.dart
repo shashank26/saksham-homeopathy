@@ -43,7 +43,7 @@ class OTPAuth {
   Future<void> initializeUserProfile(user) async {
     await firestore.collection('users').document(user.uid).setData(
         ProfileInfo.toMap(
-            ProfileInfo(displayName: '', age: '', photoUrl: '', fileName: '')));
+            ProfileInfo(displayName: '', dateOfBirth: null, photoUrl: '', fileName: '')));
   }
 
   Future authenticate(String phoneNumber, AuthCallBack authCallBack) async {

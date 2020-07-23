@@ -5,18 +5,20 @@ import 'constants.dart';
 class HeaderText extends StatelessWidget {
   final String _text;
   final double size;
-  HeaderText(this._text, {this.size: 30});
+  final TextAlign align;
+  final Color color;
+  HeaderText(this._text, {this.size: 30, this.align: TextAlign.center, this.color: AppColorPallete.textColor});
   @override
   Widget build(BuildContext context) {
     return Text(
       this._text,
       style: TextStyle(
-        color: AppColorPallete.textColor,
+        color: this.color,
         fontFamily: 'Raleway',
         fontSize: this.size,
         fontWeight: FontWeight.w900,
       ),
-      textAlign: TextAlign.center,
+      textAlign: this.align,
     );
   }
 }

@@ -10,6 +10,9 @@ class CTextFormField extends StatefulWidget {
   final void Function() onTap;
   final TextEditingController controller;
   final bool enabled;
+  final Widget prefix;
+  final Widget suffixWidget;
+  final int maxChars;
 
   CTextFormField(
       {this.enabled,
@@ -19,7 +22,10 @@ class CTextFormField extends StatefulWidget {
       this.onSaved,
       this.validator,
       this.prefixIcon,
-      this.suffixIcon});
+      this.suffixIcon,
+      this.prefix,
+      this.suffixWidget,
+      this.maxChars});
 
   @override
   _CTextFormFieldState createState() => _CTextFormFieldState();
@@ -46,11 +52,15 @@ class _CTextFormFieldState extends State<CTextFormField> {
             contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             filled: true,
             fillColor: Colors.white,
+            prefix: widget.prefix,
+            floatingLabelBehavior: FloatingLabelBehavior.never,
             labelText: widget.labelText,
             border: OutlineInputBorder(borderSide: BorderSide.none),
             prefixIcon: widget.prefixIcon,
             suffixIcon: widget.suffixIcon,
+            suffix: widget.suffixWidget,
           ),
+          maxLength: widget.maxChars,
           validator: widget.validator,
           onTap: widget.onTap,
           controller: widget.controller,

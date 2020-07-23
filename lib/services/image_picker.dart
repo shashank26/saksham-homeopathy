@@ -10,25 +10,29 @@ class CImagePicker {
     MessageImageInfo info = MessageImageInfo();
     final picker = ImagePicker();
     PickedFile rawImage = await picker.getImage(source: source, maxHeight: 500);
-    if (rawImage != null) {
-      File croppedImage =
-          await ImageCropper.cropImage(sourcePath: rawImage.path);
-      final File image =
-          croppedImage == null ? File(rawImage.path) : croppedImage;
-      info.file = image;
-      final raw = await FlutterImageCompress.compressWithFile(
-        image.absolute.path,
-        quality: 10,
-      );
-      File blurred = File(image.parent.path + '/blurred.png');
-      blurred.writeAsBytes(raw);
-      info.blurredFile = blurred;
-      return info;
+    if (rawImage == null) {
+      return null;
     }
-    return null;
+
+    File croppedImage = await ImageCropper.cropImage(sourcePath: rawImage.path);
+    if (croppedImage == null) {
+      return null;
+    }
+    final File image =
+        croppedImage == null ? File(rawImage.path) : croppedImage;
+    info.file = image;
+    final raw = await FlutterImageCompress.compressWithFile(
+      image.absolute.path,
+      quality: 10,
+    );
+    File blurred = File(image.parent.path + '/blurred.png');
+    blurred.writeAsBytes(raw);
+    info.blurredFile = blurred;
+    return info;
   }
 
-  static Future<ProfileInfo> getProfilePhoto(ImageSource source, ProfileInfo info) async {
+  static Future<ProfileInfo> getProfilePhoto(
+      ImageSource source, ProfileInfo info) async {
     final picker = ImagePicker();
     PickedFile rawImage = await picker.getImage(source: source, maxHeight: 500);
     if (rawImage != null) {
@@ -38,6 +42,19 @@ class CImagePicker {
           croppedImage == null ? File(rawImage.path) : croppedImage;
       info.file = image;
       return info;
+    }
+    return null;
+  }
+
+  static Future<File> getImage(ImageSource source) async {
+    final picker = ImagePicker();
+    PickedFile rawImage = await picker.getImage(source: source, maxHeight: 500);
+    if (rawImage != null) {
+      File croppedImage =
+          await ImageCropper.cropImage(sourcePath: rawImage.path);
+      final File image =
+          croppedImage == null ? File(rawImage.path) : croppedImage;
+      return image;
     }
     return null;
   }

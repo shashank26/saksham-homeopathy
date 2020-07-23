@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:saksham_homeopathy/common/CTextFormField.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
+import 'package:saksham_homeopathy/common/date_dialog.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/models/medicine_info.dart';
 
@@ -50,21 +51,11 @@ class AddMedicineForm extends StatelessWidget {
               suffixIcon: IconButton(
                 icon: Icon(Icons.date_range),
                 onPressed: () async {
-                  final DateTime dateSelected = await showDatePicker(
+                  final DateTime dateSelected = await showDateDialog(
                       context: context,
                       initialDate: DateTime.now(),
                       firstDate: DateTime.now().subtract(Duration(days: 365)),
-                      lastDate: DateTime.now().add(Duration(days: 365)),
-                      builder: (context, child) {
-                        return Theme(
-                          child: child,
-                          data: ThemeData.light().copyWith(
-                              colorScheme: ColorScheme.light(
-                                  primary: AppColorPallete.color),
-                              buttonTheme: ButtonThemeData(
-                                  textTheme: ButtonTextTheme.primary)),
-                        );
-                      });
+                      lastDate: DateTime.now().add(Duration(days: 365)));
                   if (dateSelected != null) {
                     this._medicineInfo.datePrescribed = dateSelected;
                     _dateController.text = this._medicineInfo.datePrescribed;

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/home/admin_chat_page.dart';
+import 'package:saksham_homeopathy/home/admin_updates.dart';
 import 'package:saksham_homeopathy/home/historyPage.dart';
 import 'package:saksham_homeopathy/home/profilePage.dart';
 import 'package:saksham_homeopathy/services/chat_service.dart';
@@ -22,6 +23,7 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
   Animation<double> animation;
   List<Widget> widgets = [];
   Stream unreadMessages;
+  // List<int> _traversedIndexes = [];
 
   @override
   void initState() {
@@ -32,13 +34,13 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
         CurvedAnimation(parent: _animationController, curve: Curves.easeIn);
     if (OTPAuth.isAdmin) {
       this.widgets = <Widget>[
-        Text(widget.user.phoneNumber),
+        AdminUpdates(),
         AdminChatPage(),
         ProfilePage(widget.user),
       ];
     } else {
       this.widgets = <Widget>[
-        Text(widget.user.phoneNumber),
+        AdminUpdates(),
         ChatPage(OTPAuth.adminId),
         HistoryView(user: widget.user, uid: widget.user.uid),
         ProfilePage(widget.user),
@@ -55,6 +57,20 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
     }
   }
 
+  _navigate(index, {isPop = false}) {
+    _animationController.reset();
+          setState(() {
+            _animationController.forward();
+            _currentIndex = index;
+            // if (!isPop){
+            //   _traversedIndexes.add(_currentIndex);
+            // }
+            if (!OTPAuth.isAdmin) {
+              (this.widgets[1] as ChatPage).setView(_currentIndex == 1);
+            }
+          });
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -66,9 +82,24 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
     return Scaffold(
       body: FadeTransition(
         opacity: animation,
-        child: IndexedStack(
-          index: _currentIndex,
-          children: widgets,
+        child: WillPopScope(
+          onWillPop: () async {
+            if (_currentIndex != 0) {
+              _navigate(0);
+              return false;
+            }
+            return true;
+            // if (_traversedIndexes.length == 0) {
+            //   return true;
+            // } else {
+            //   _navigate(_traversedIndexes.removeAt(0), isPop : true);
+            //   return false;
+            // }
+          },
+          child: IndexedStack(
+            index: _currentIndex,
+            children: widgets,
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -76,14 +107,7 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
         elevation: 5,
         currentIndex: _currentIndex,
         onTap: (int index) {
-          _animationController.reset();
-          setState(() {
-            _animationController.forward();
-            _currentIndex = index;
-            if (!OTPAuth.isAdmin) {
-              (this.widgets[1] as ChatPage).setView(_currentIndex == 1);
-            }
-          });
+          _navigate(index);
         },
         iconSize: 40,
         items: [

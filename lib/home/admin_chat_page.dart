@@ -1,6 +1,8 @@
 import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:saksham_homeopathy/common/constants.dart';
+import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/home/user_chat_tile.dart';
 import 'package:saksham_homeopathy/services/chat_service.dart';
 
@@ -52,8 +54,22 @@ class _AdminChatPageState extends State<AdminChatPage>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: StreamBuilder<QuerySnapshot>(
+    return Scaffold(
+      appBar: _currentIndex == 0
+          ? AppBar(
+              title: Container(
+                padding: EdgeInsets.all(10),
+                width: double.maxFinite,
+                color: AppColorPallete.color,
+                child: HeaderText(
+                  "Chats",
+                  align: TextAlign.left,
+                  size: 40,
+                ),
+              ),
+            )
+          : null,
+      body: StreamBuilder<QuerySnapshot>(
           stream: ChatService.getChatListStream(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {

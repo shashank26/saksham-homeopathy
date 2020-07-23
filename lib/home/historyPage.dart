@@ -55,28 +55,50 @@ class _HistoryViewState extends State<HistoryView> {
             onPressed: () {
               _settingModal(context);
             },
-            child: Icon(Icons.add, color: AppColorPallete.color,),
+            child: Icon(
+              Icons.add,
+              color: AppColorPallete.color,
+            ),
             backgroundColor: Colors.white,
           ),
         ),
-        body: StreamBuilder(
-            stream: _historyStream,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data.documents.length > 0) {
-                  final List<DocumentSnapshot> medicineInfoList =
-                      snapshot.data.documents;
-                  return ListView.builder(
-                    itemCount: medicineInfoList.length,
-                    itemBuilder: (context, index) {
-                      return HistoryTile(medicineInfoList.elementAt(index));
-                    },
-                  );
-                } else {
-                  return Center(child: HeaderText('No Medicines added.'));
-                }
-              }
-              return Center(child: HeaderText('Loading...'));
-            }));
+        body: Column(
+          children: <Widget>[
+            Material(
+              elevation: 5,
+              child: Container(
+                  padding: EdgeInsets.all(10),
+                  width: MediaQuery.of(context).size.width,
+                  color: AppColorPallete.color,
+                  child: HeaderText(
+                    "History",
+                    align: TextAlign.left,
+                    size: 40,
+                  )),
+            ),
+            Expanded(
+              child: StreamBuilder(
+                  stream: _historyStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data.documents.length > 0) {
+                        final List<DocumentSnapshot> medicineInfoList =
+                            snapshot.data.documents;
+                        return ListView.builder(
+                          itemCount: medicineInfoList.length,
+                          itemBuilder: (context, index) {
+                            return HistoryTile(
+                                medicineInfoList.elementAt(index));
+                          },
+                        );
+                      } else {
+                        return Center(child: HeaderText('No Medicines added.'));
+                      }
+                    }
+                    return Center(child: HeaderText('Loading...'));
+                  }),
+            ),
+          ],
+        ));
   }
 }

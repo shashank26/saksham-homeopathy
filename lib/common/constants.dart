@@ -12,9 +12,11 @@ class AppColorPallete {
 }
 
 class ImagePath {
-  static final profilePhotoPath = (String uid) => 'photoUrl/$uid.png';
+  static final profilePhotoPath = (String uid) => 'photoUrl/$uid/${Uuid().v1()}.png';
   static final imageMessagePath =
       (String uid) => 'messages/$uid/${Uuid().v1()}.png';
+      static final imagePostPath =
+      () => 'adminPosts/${Uuid().v1()}.png';
 }
 
 class FirestoreCollection {
@@ -37,6 +39,8 @@ class FirestoreCollection {
       (String uid) => Firestore.instance.collection('users').document(uid);
   static final getAdminInfo =
       () => Firestore.instance.collection('users').where('isAdmin', isEqualTo: true).snapshots().first;
+  static final adminUpdates = Firestore.instance.collection('adminUpdates').orderBy('timeStamp', descending: true);
+  static final postUpdate = Firestore.instance.collection('adminUpdates');
 }
 
 class FirebaseStreams {
@@ -58,4 +62,7 @@ enum LoginState {
 enum PhotoUploadState { started, inProgress, complete }
 
 enum DialogType { alert, progress }
+
+Function noe = (String str) => str == null || str.trim() == '';
+
 // final showSnackBar = (context, text) => Scaffold.of(context).showSnackBar(SnackBar(content: text, ))

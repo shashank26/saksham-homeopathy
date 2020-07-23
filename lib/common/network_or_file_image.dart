@@ -11,12 +11,14 @@ class NetworkOrFileImage extends StatefulWidget {
   final String _url;
   final String _blurredUrl;
   final String _fileName;
+  bool raw;
   double height;
   double width;
 
   NetworkOrFileImage(this._url, this._blurredUrl, this._fileName,
-      {double height, double width}) {
+      {double height, double width, bool raw = false}) {
     this.height = height;
+    this.raw = raw;
     this.width = width;
   }
 
@@ -35,6 +37,16 @@ class _NetworkOrFileImageState extends State<NetworkOrFileImage> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.raw) {
+      return Image.file(
+                FileHandler.instance
+              .getRawFile(widget._fileName),
+                fit: BoxFit.fill,
+                height: widget.height,
+                width: widget.width,
+              );
+    }
+
     if (widget._blurredUrl != null &&
         widget._blurredUrl != '' &&
         _loadBlurImage) {
