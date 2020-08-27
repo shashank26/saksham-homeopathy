@@ -29,21 +29,19 @@ class OTPAuth {
   }
 
   static Future<void> initializeInfo() async {
-    final user = await FirebaseAuth.instance.currentUser();
+    currentUser = await FirebaseAuth.instance.currentUser();
     DocumentSnapshot ds =
-        await FirestoreCollection.userInfo(user.uid).get();
+        await FirestoreCollection.userInfo(currentUser.uid).get();
     isAdmin = ds.data['isAdmin'] == true;
-    currentUser = user;
     final adminDocument = (await FirestoreCollection.getAdminInfo()).documents[0];
     adminProfile = ProfileInfo.fromMap(adminDocument.data);
     adminId = adminDocument.documentID;
-    FirebaseStreams.initializeStreams(user);
   }
 
-  Future<void> initializeUserProfile(user) async {
+  Future<void> initializeUserProfile(FirebaseUser user) async {
     await firestore.collection('users').document(user.uid).setData(
         ProfileInfo.toMap(
-            ProfileInfo(displayName: '', dateOfBirth: null, photoUrl: '', fileName: '')));
+            ProfileInfo(displayName: '', dateOfBirth: null, photoUrl: '', fileName: '', phoneNumber: user.phoneNumber)));
   }
 
   Future authenticate(String phoneNumber, AuthCallBack authCallBack) async {

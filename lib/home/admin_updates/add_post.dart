@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
@@ -11,18 +12,39 @@ import 'package:saksham_homeopathy/services/image_picker.dart';
 
 class AddPost extends StatefulWidget {
   final _parContext;
-  AddPost(this._parContext);
+  final DocumentSnapshot _post;
+  AddPost(this._parContext, this._post);
 
   @override
   _AddPostState createState() => _AddPostState();
 }
 
 class _AddPostState extends State<AddPost> {
-  AdminPost _post = AdminPost();
+  AdminPost _post;
   bool _addLink = false;
-  ImageSource _imageSource = ImageSource.camera;
+  ImageSource _imageSource;
   final _postText = TextEditingController(text: '');
   final _href = TextEditingController(text: '');
+
+  @override
+  initState() {
+    super.initState();
+    if (widget._post == null) {
+      _post = AdminPost();
+      return;
+    }
+    _post = AdminPost.fromMap(widget._post.data);
+    _postText.text = _post.text;
+    if (!noe(_post.imageUrl)) {
+      FileHandler.instance
+          .getFile(_post.imageUrl, _post.imageName)
+          .then((value) {
+        setState(() {
+          _post.image = value;
+        });
+      });
+    }
+  }
 
   _postUpdate() async {
     try {
@@ -32,9 +54,14 @@ class _AddPostState extends State<AddPost> {
       _post.text = _postText.text.trim();
       _post.href = _href.text;
       _post.timeStamp = DateTime.now();
-      if (_post.image != null)
+      if (_post.image != null) {
         await FileHandler.instance.uploadPostImage(_post);
-      await FirestoreCollection.postUpdate.add(AdminPost.toMap(_post));
+      }
+      if (widget._post != null) {
+        widget._post.reference.updateData(AdminPost.toMap(_post));
+      } else {
+        await FirestoreCollection.postUpdate.add(AdminPost.toMap(_post));
+      }
       _post = new AdminPost();
       _href.text = '';
       _postText.text = '';
@@ -64,17 +91,21 @@ class _AddPostState extends State<AddPost> {
                     ),
                     onPressed: () async {
                       await showModalBottomSheet(
+                        backgroundColor: Colors.transparent,
+                        barrierColor: Colors.black.withOpacity(0.5),
                           context: context,
                           builder: (builder) =>
                               ImageSourceBottomSheet((ImageSource imageSource) {
                                 _imageSource = imageSource;
                               }));
-                      final File image =
-                          await CImagePicker.getImage(_imageSource);
-                      setState(() {
-                        _post.image = image;
-                        _post.imageName = ImagePath.imagePostPath();
-                      });
+                      if (_imageSource != null) {
+                        final File image =
+                            await CImagePicker.getImage(_imageSource);
+                        setState(() {
+                          _post.image = image;
+                          _post.imageName = ImagePath.imagePostPath();
+                        });
+                      }
                     },
                   ),
                   // IconButton(
@@ -175,7 +206,7 @@ class _AddPostState extends State<AddPost> {
                   await _postUpdate();
                 },
                 child: Text(
-                  'Post',
+                  widget._post == null ? 'Post' : 'Update',
                   style: TextStyle(color: Colors.white),
                 ),
               ),

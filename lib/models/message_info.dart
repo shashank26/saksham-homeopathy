@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class MessageInfo {
+  String documentId;
   String blurredImage;
   String image;
   String sender;
@@ -11,7 +13,7 @@ class MessageInfo {
   bool _isRead;
 
   MessageInfo(String sender, String receiver, String message,
-      String blurredImage, String image, String fileName, dynamic timeStamp, dynamic isRead) {
+      String blurredImage, String image, String fileName, dynamic timeStamp, dynamic isRead, {String documentId}) {
     this.sender = sender;
     this.receiver = receiver;
     this.message = message;
@@ -20,6 +22,7 @@ class MessageInfo {
     this.fileName = fileName;
     this.timeStamp = timeStamp;
     this.isRead = isRead;
+    this.documentId = documentId;
   }
 
   DateTime get timeStamp => _timeStamp;
@@ -40,6 +43,16 @@ class MessageInfo {
     } else {
       _isRead = isRead == 'true';
     }
+  }
+
+  String getMessageTimestamp() {
+    if (DateTime.now().difference(this._timeStamp) < Duration(days: 1) && DateTime.now().day == this._timeStamp.day) {
+      return 'Today ' + timeFormat.format(this._timeStamp);
+    }
+    else if (DateTime.now().difference(this._timeStamp) < Duration(days: 7)) {
+      return weekdayFormat.format(this._timeStamp);
+    }
+    return defaultForamt.format(this._timeStamp);
   }
 
   static Map<String, dynamic> toMap(MessageInfo info) {
@@ -66,4 +79,8 @@ class MessageInfo {
         json['timeStamp'],
         json['isRead']);
   }
+
+  static final DateFormat weekdayFormat = DateFormat('EEEE').add_jm();
+  static final DateFormat defaultForamt = DateFormat.yMd().add_jm();
+  static final DateFormat timeFormat = DateFormat.jm();
 }

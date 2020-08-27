@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:saksham_homeopathy/common/CTextFormField.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
@@ -20,7 +21,8 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 class ChatPage extends StatefulWidget {
   final ChatService chatService;
   final ProfileInfo _profileInfo;
-  ChatPage(this.chatService, this._profileInfo);
+  final Stream<bool> _isVisibleStream;
+  ChatPage(this.chatService, this._profileInfo, this._isVisibleStream);
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -36,13 +38,33 @@ class _ChatPageState extends State<ChatPage> {
   Stream<QuerySnapshot> chatStream;
   int batch = 1;
   final int batchSize = 20;
-  bool isInView = true;
-  // int lastUnreadIndex;
+  StreamSubscription ss, vis, unread;
+  bool shouldScroll = false;
 
   @override
   initState() {
     super.initState();
-    initChatStream();
+    if (vis == null && widget._isVisibleStream != null) {
+      unread = ChatService.unreadMessageStream();
+      vis = widget._isVisibleStream.listen((event) {
+        if (event) {
+          shouldScroll = true;
+          if (ss == null) {
+            initChatStream();
+          } else {
+            ss.resume();
+          }
+          Future.delayed(Duration(seconds: 1)).then((f) {
+            unread.pause();
+          });
+        } else if (ss != null) {
+          ss.pause();
+          unread.resume();
+        }
+      });
+    } else {
+      initChatStream();
+    }
 
     controller = AutoScrollController(
         viewportBoundaryGetter: () =>
@@ -57,29 +79,36 @@ class _ChatPageState extends State<ChatPage> {
         initChatStream();
       }
     });
-    // WidgetsBinding.instance.addPostFrameCallback((_) async {
-    //   int lastUnreadIndex = messages.lastIndexWhere((element) => element.data['isRead'] == false);
-    //   if (lastUnreadIndex != null || lastUnreadIndex !=) {
+  }
 
-    //   }
-    // });
+  @override
+  void dispose() {
+    super.dispose();
+    if (ss != null) {
+      ss.cancel();
+    }
+    if (unread != null) {
+      unread.cancel();
+    }
   }
 
   void initChatStream() async {
     oldMessagesLoadingFlag = true;
-    setState(() {
-      chatStream = widget.chatService.getChatStream(batch * batchSize);
-    });
-    oldMessagesLoadingFlag = false;
-  }
-
-  void loadOldMessages(DocumentSnapshot afterSnapshot) {
-    oldMessagesLoadingFlag = true;
-    widget.chatService.getOldMessages(afterSnapshot).then((value) {
+    // setState(() {
+    if (ss != null) {
+      await ss.cancel();
+    }
+    ss = widget.chatService.getChatStream(batch * batchSize).listen((event) {
       setState(() {
-        messages.addAll(value.documentChanges.map((e) => e.document));
+        messages = [];
+        messages.addAll(event.documents);
+        // if (shouldScroll) {
+        //   _scrollToIndex(messages
+        //       .lastIndexWhere((element) => element.data['isRead'] == false));
+        //   shouldScroll = false;
+        // }
+        oldMessagesLoadingFlag = false;
       });
-      oldMessagesLoadingFlag = false;
     });
   }
 
@@ -87,6 +116,8 @@ class _ChatPageState extends State<ChatPage> {
     ImageSource _imageSource;
     await showModalBottomSheet(
         context: context,
+        backgroundColor: Colors.transparent,
+        barrierColor: Colors.black.withOpacity(0.5),
         builder: (context) => ImageSourceBottomSheet((ImageSource imageSource) {
               _imageSource = imageSource;
             }));
@@ -146,9 +177,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   _updateUnreadStatus(MessageInfo info, DocumentReference ref) {
-    if (info.isRead == false &&
-        info.sender != OTPAuth.currentUser.uid &&
-        isInView) {
+    if (info.isRead == false && info.sender != OTPAuth.currentUser.uid) {
       info.isRead = true;
       ref.updateData(MessageInfo.toMap(info));
     }
@@ -156,15 +185,27 @@ class _ChatPageState extends State<ChatPage> {
 
   _scrollToIndex(int index) async {
     if (index != -1)
-      await controller.scrollToIndex(index,
-          preferPosition: AutoScrollPosition.end);
-    controller.highlight(index);
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await controller.scrollToIndex(index,
+            preferPosition: AutoScrollPosition.end);
+        controller.highlight(index);
+      });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          if (OTPAuth.isAdmin)
+            IconButton(
+              icon: Icon(Icons.history),
+              color: AppColorPallete.textColor,
+              onPressed: () {
+                _goToMedicineHistory();
+              },
+            )
+        ],
         backgroundColor: Colors.white,
         titleSpacing: OTPAuth.isAdmin ? 0 : 10,
         title: GestureDetector(
@@ -183,84 +224,58 @@ class _ChatPageState extends State<ChatPage> {
             children: <Widget>[
               Expanded(
                 child: Align(
-                  alignment: FractionalOffset.bottomCenter,
-                  child: StreamBuilder<QuerySnapshot>(
-                      stream: chatStream,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          bool shouldScroll = messages.length == 0;
-                          messages = [];
-                          messages.addAll(snapshot.data.documents);
-                          if (shouldScroll) {
-                            _scrollToIndex(messages.lastIndexWhere(
-                                (element) => element.data['isRead'] == false));
-                          }
-                          if (messages.length == 0) {
-                            return Center(child: HeaderText("Start a chat."));
-                          }
-                          return ListView.builder(
-                              shrinkWrap: true,
-                              padding: EdgeInsets.all(8),
-                              reverse: true,
-                              itemCount: messages.length,
-                              controller: controller,
-                              itemBuilder: (context, index) {
-                                MessageInfo info =
-                                    MessageInfo.fromMap(messages[index].data);
-                                _updateUnreadStatus(
-                                    info, messages[index].reference);
-                                return AutoScrollTag(
-                                  key: ValueKey(index),
-                                  controller: controller,
-                                  index: index,
-                                  highlightColor: Colors.white,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      child: GestureDetector(
-                                        onLongPress: () async {
-                                          if (OTPAuth.currentUser.uid ==
-                                              info.sender)
-                                            await showModalBottomSheet(
-                                                context: context,
-                                                builder: (context) {
-                                                  return Container(
-                                                    height: 100,
-                                                    child: Column(
-                                                      children: [
-                                                        FlatButton(
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                              _deleteMessage(
-                                                                  messages[
-                                                                      index]);
-                                                            },
-                                                            child:
-                                                                Text("Delete")),
-                                                        FlatButton(
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child:
-                                                                Text("Cancel")),
-                                                      ],
-                                                    ),
-                                                  );
-                                                });
-                                        },
-                                        child: MessageBubble(info),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              });
-                        } else {
-                          return Container();
-                        }
-                      }),
-                ),
+                    alignment: FractionalOffset.bottomCenter,
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.all(8),
+                        reverse: true,
+                        itemCount: messages.length,
+                        controller: controller,
+                        itemBuilder: (context, index) {
+                          MessageInfo info =
+                              MessageInfo.fromMap(messages[index].data);
+                          _updateUnreadStatus(info, messages[index].reference);
+                          return AutoScrollTag(
+                            key: ValueKey(index),
+                            controller: controller,
+                            index: index,
+                            highlightColor: Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                child: GestureDetector(
+                                  onLongPress: () async {
+                                    if (OTPAuth.currentUser.uid == info.sender)
+                                      await showModalBottomSheet(
+                                          context: context,
+                                          builder: (context) {
+                                            return Container(
+                                              height: 100,
+                                              child: Column(
+                                                children: [
+                                                  FlatButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                        _deleteMessage(
+                                                            messages[index]);
+                                                      },
+                                                      child: Text("Delete")),
+                                                  FlatButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text("Cancel")),
+                                                ],
+                                              ),
+                                            );
+                                          });
+                                  },
+                                  child: MessageBubble(info),
+                                ),
+                              ),
+                            ),
+                          );
+                        })),
               ),
               Visibility(
                   visible: _imageSendingInProcess,

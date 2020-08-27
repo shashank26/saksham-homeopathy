@@ -7,9 +7,7 @@ import 'package:saksham_homeopathy/common/typedefs.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
 
 class LoginForm extends StatefulWidget {
-  final OTPAuth _otpAuth;
-
-  LoginForm(this._otpAuth);
+  final _otpAuth = OTPAuth.instance;
 
   receiveOTP(String phoneNumber, AuthCallBack authCallBack) async {
     this._otpAuth.authenticate(phoneNumber, authCallBack);
@@ -28,7 +26,6 @@ class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   LoginState _loginState = LoginState.verficationStart;
   String _phoneNumber, _otp;
-  AuthCallBack _authCallBack;
   String _verificationId;
 
   _showDialog(String text, DialogType dialogType) {
@@ -76,7 +73,6 @@ class _LoginFormState extends State<LoginForm> {
   @override
   void initState() {
     super.initState();
-    this._authCallBack = this._handleAuthCallBack;
   }
 
   @override
@@ -101,9 +97,12 @@ class _LoginFormState extends State<LoginForm> {
               filled: true,
               fillColor: Colors.white,
               hintText: 'Phone number',
-              prefixIcon: Icon(
-                Icons.phone,
-                color: AppColorPallete.color,
+              prefixIcon: Container(
+                width: 60,
+                child: Icon(
+                  Icons.phone,
+                  color: AppColorPallete.color,
+                ),
               ),
             ),
             maxLength: 10,
@@ -156,11 +155,11 @@ class _LoginFormState extends State<LoginForm> {
                 if (_formKey.currentState.validate()) {
                   if (_loginState == LoginState.verficationStart) {
                     _showDialog('Sending OTP...', DialogType.progress);
-                    widget.receiveOTP(this._phoneNumber, this._authCallBack);
+                    widget.receiveOTP(this._phoneNumber, this._handleAuthCallBack);
                   } else if (_loginState == LoginState.otpSent) {
                     _showDialog('Verifying OTP...', DialogType.progress);
                     widget.verifyOTP(
-                        this._verificationId, this._otp, this._authCallBack);
+                        this._verificationId, this._otp, this._handleAuthCallBack);
                   }
                 }
               },

@@ -11,8 +11,13 @@ class AppColorPallete {
   static const Color textColor = Color(0xFF5C6773);
 }
 
+class LocalStorage {
+  static final profileStorage = (String uid) => 'profileInfo/$uid/profileInfo.json';
+  static final chatStorage = (String uid) => 'messages/$uid/chat.json';
+}
+
 class ImagePath {
-  static final profilePhotoPath = (String uid) => 'photoUrl/$uid/${Uuid().v1()}.png';
+  static final profilePhotoPath = (String uid) => 'photoUrl/$uid/profilePhoto.png';
   static final imageMessagePath =
       (String uid) => 'messages/$uid/${Uuid().v1()}.png';
       static final imagePostPath =
@@ -25,13 +30,8 @@ class FirestoreCollection {
       .collection('messages')
       .document(uid)
       .collection('chat');
-  static final latestMessage = (DocumentReference docRef) =>
-      docRef.collection('chat').orderBy('timeStamp', descending: true).limit(1);
-  static final unreadMessageCount = (DocumentReference docRef) => docRef
-      .collection('chat')
-      .where('isRead', isEqualTo: false)
-      .where('receiver', isEqualTo: OTPAuth.currentUser.uid)
-      .snapshots();
+  static final latestMessage = (String uid) =>
+      chat(uid).orderBy('timeStamp', descending: true).limit(1).snapshots();
   static final userChatDocument =
       (String uid) => Firestore.instance.collection('messages').document(uid);
   static final messages = Firestore.instance.collection('messages');
@@ -41,13 +41,7 @@ class FirestoreCollection {
       () => Firestore.instance.collection('users').where('isAdmin', isEqualTo: true).snapshots().first;
   static final adminUpdates = Firestore.instance.collection('adminUpdates').orderBy('timeStamp', descending: true);
   static final postUpdate = Firestore.instance.collection('adminUpdates');
-}
-
-class FirebaseStreams {
-  static Stream<DocumentSnapshot> profileStream;
-  static initializeStreams(FirebaseUser user) {
-    profileStream = FirestoreCollection.userInfo(user.uid).snapshots();
-  }
+  static final profileStream = (uid) => FirestoreCollection.userInfo(uid).snapshots();
 }
 
 enum LoginState {

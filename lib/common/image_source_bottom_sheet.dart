@@ -9,49 +9,77 @@ class ImageSourceBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColorPallete.color,
-      height: 102,
+      color: Colors.transparent,
+      // height: 300,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
-            MaterialButton(
-              elevation: 0,
-              color: Colors.white,
-              height: 50,
-              onPressed: () {
-                callback(ImageSource.camera);
-                Navigator.pop(context);
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(Icons.camera_alt),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text('Camera'),
-                  ),
-                ],
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical : 5.0, horizontal: 10),
+              child: MaterialButton(
+                elevation: 0,
+                color: Colors.white,
+                height: 50,
+                onPressed: () {
+                  callback(ImageSource.camera);
+                  Navigator.pop(context);
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(Icons.camera_alt),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text('Camera'),
+                    ),
+                  ],
+                ),
               ),
             ),
-            MaterialButton(
-              elevation: 0,
-              color: Colors.white,
-              height: 50,
-              onPressed: () {
-                callback(ImageSource.gallery);
-                Navigator.pop(context);
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(Icons.photo),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text('Images'),
-                  ),
-                ],
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical : 5.0, horizontal: 10),
+              child: MaterialButton(
+                elevation: 0,
+                color: Colors.white,
+                height: 50,
+                onPressed: () {
+                  callback(ImageSource.gallery);
+                  Navigator.pop(context);
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(Icons.photo),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text('Images'),
+                    ),
+                  ],
+                ),
               ),
-            )
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical : 5.0, horizontal: 10),
+              child: MaterialButton(
+                elevation: 0,
+                color: Colors.white,
+                height: 50,
+                onPressed: () {
+                  callback(null);
+                  Navigator.pop(context);
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(Icons.cancel),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text('Cancel'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
     );

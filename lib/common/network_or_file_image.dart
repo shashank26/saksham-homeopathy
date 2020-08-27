@@ -32,7 +32,7 @@ class _NetworkOrFileImageState extends State<NetworkOrFileImage> {
   @override
   void initState() {
     super.initState();
-    _loadBlurImage = !FileHandler.instance.exists(widget._fileName);
+    _loadBlurImage = !FileHandler.instance.exists(fileName : widget._fileName);
   }
 
   @override
@@ -40,8 +40,8 @@ class _NetworkOrFileImageState extends State<NetworkOrFileImage> {
     if (widget.raw) {
       return Image.file(
                 FileHandler.instance
-              .getRawFile(widget._fileName),
-                fit: BoxFit.fill,
+              .getRawFile(fullName : widget._fileName),
+                fit: BoxFit.cover,
                 height: widget.height,
                 width: widget.width,
               );
@@ -68,7 +68,7 @@ class _NetworkOrFileImageState extends State<NetworkOrFileImage> {
             if (snapshot.hasData) {
               return Image.file(
                 snapshot.data,
-                fit: BoxFit.fill,
+                fit: BoxFit.cover,
                 height: widget.height,
                 width: widget.width,
               );

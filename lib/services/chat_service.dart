@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,50 +14,50 @@ import 'image_picker.dart';
 
 class ChatService {
   String _sender;
-  String _receiver;
-  CollectionReference chatRef;
+  String receiver;
+  CollectionReference _chatRef;
   FirebaseUser _user = OTPAuth.currentUser;
   FileHandler _fileHandler = FileHandler.instance;
-  static StreamController<int> unreadChats = StreamController.broadcast();
+  String chatId;
+  static StreamController<Map<String, bool>> unreadStreamController;
 
-  ChatService({String receiver}) {
-    this._receiver = receiver;
-    chatRef = FirestoreCollection.chat(OTPAuth.isAdmin ? receiver : _user.uid);
+  ChatService(String receiver) {
+    this.chatId = OTPAuth.isAdmin ? receiver : _user.uid;
+    this.receiver = receiver;
+    _chatRef = FirestoreCollection.chat(chatId);
     _sender = _user.uid;
   }
 
-  Stream<QuerySnapshot> getChatStream() {
-    return chatRef.orderBy('timeStamp', descending: true).snapshots();
+  Stream<QuerySnapshot> getChatStream(int limit) {
+    return _chatRef
+        .orderBy('timeStamp', descending: true)
+        .limit(limit)
+        .snapshots();
   }
 
-  static Stream<QuerySnapshot> unreadMessageStream(
-      DocumentReference documentReference) {
-    return FirestoreCollection.unreadMessageCount(documentReference);
+  Future<QuerySnapshot> getOldMessages(DocumentSnapshot after) {
+    return _chatRef
+        .orderBy('timeStamp', descending: true)
+        .startAfterDocument(after)
+        .limit(10)
+        .getDocuments();
   }
 
   updateTimestamp(bool isNewChat) async {
-    String uid = _user.uid;
-    if (OTPAuth.isAdmin) {
-      uid = _receiver;
-    }
-    if (isNewChat)
-      await FirestoreCollection.userChatDocument(uid)
-          .setData({'latestTimestamp': DateTime.now()});
-    else
-      await FirestoreCollection.userChatDocument(uid)
-          .setData({'latestTimestamp': DateTime.now()});
+    await FirestoreCollection.userChatDocument(chatId)
+        .setData({'latestTimestamp': DateTime.now()});
   }
 
   Future sendMessage(String message, bool isNewChat) async {
     MessageInfo info = MessageInfo(
-        _sender, _receiver, message, null, null, null, DateTime.now(), false);
-    await chatRef.add(MessageInfo.toMap(info));
+        _sender, receiver, message, null, null, null, DateTime.now(), false);
+    await _chatRef.add(MessageInfo.toMap(info));
     await updateTimestamp(isNewChat);
   }
 
   sendNotification(String message) async {
-    final data = MessageInfo.toMap(MessageInfo(_sender, _receiver, message,
-        null, null, null, DateTime.now().toString(), false));
+    final data = MessageInfo.toMap(MessageInfo(_sender, receiver, message, null,
+        null, null, DateTime.now().toString(), false));
     final res = await CloudFunctions.instance
         .getHttpsCallable(functionName: 'sendNotification')
         .call(data);
@@ -73,9 +72,9 @@ class ChatService {
       MessageImageInfo uploadedImages =
           await _fileHandler.uploadMessageImage(images);
 
-      await chatRef.add(MessageInfo.toMap(MessageInfo(
+      await _chatRef.add(MessageInfo.toMap(MessageInfo(
           _sender,
-          _receiver,
+          receiver,
           null,
           uploadedImages.blurredUrl,
           uploadedImages.url,
@@ -87,8 +86,11 @@ class ChatService {
   }
 
   static Future<ProfileInfo> setProfilePhoto(
-      ProfileInfo info, DocumentReference userDocRef, Function uploadStarted) async {
-    final images = await CImagePicker.getProfilePhoto(ImageSource.camera, info);
+      ProfileInfo info,
+      DocumentReference userDocRef,
+      Function uploadStarted,
+      ImageSource source) async {
+    final images = await CImagePicker.getProfilePhoto(source, info);
     if (images != null) {
       images.fileName = ImagePath.profilePhotoPath(userDocRef.documentID);
       uploadStarted();
@@ -100,6 +102,21 @@ class ChatService {
     }
     return null;
   }
+
+  // static Future<ProfileInfo> setProfilePhoto(ProfileInfo info,
+  //     DocumentReference userDocRef, Function uploadStarted) async {
+  //   final images = await CImagePicker.getProfilePhoto(ImageSource.camera, info);
+  //   if (images != null) {
+  //     images.fileName = ImagePath.profilePhotoPath(userDocRef.documentID);
+  //     uploadStarted();
+  //     ProfileInfo uploadedImages =
+  //         await FileHandler.instance.uploadProfilePhoto(images);
+  //     imageCache.clear();
+  //     await userDocRef.updateData(ProfileInfo.toMap(uploadedImages));
+  //     return uploadedImages;
+  //   }
+  //   return null;
+  // }
 
   MessageInfo getMessageInfo(AsyncSnapshot<dynamic> snapshot, index) {
     return MessageInfo.fromMap(snapshot.data.documents[index].data);
@@ -115,36 +132,20 @@ class ChatService {
     return FirestoreCollection.userInfo(uid).snapshots();
   }
 
-  static Stream<QuerySnapshot> getLatestMessageStream(
-      DocumentReference docRef) {
-    return FirestoreCollection.latestMessage(docRef).snapshots();
-  }
-
-  static initializeUnreadMessageStream({DocumentReference documentReference}) {
-    if (ChatService.unreadChats.isClosed)
-      ChatService.unreadChats = StreamController.broadcast();
-    if (OTPAuth.isAdmin) {
-      final unreadMap = new HashMap<String, int>();
-      ChatService.getChatListStream().listen((event) {
-        event.documents.forEach((element) {
-          unreadMap.putIfAbsent(element.documentID, () => 0);
-          ChatService.unreadMessageStream(element.reference).listen((event) {
-            unreadMap.update(
-                element.documentID, (value) => event.documents.length);
-            ChatService.unreadChats.add(
-                unreadMap.values.reduce((value, element) => value + element));
-          });
-        });
-      });
-    } else {
-      unreadMessageStream(documentReference).listen((event) {
-        ChatService.unreadChats.add(event.documents.length);
-      });
-    }
-  }
-
   static Future postUpdate(String text) async {
-    await FirestoreCollection.postUpdate.add({'postImage' : null, 'postText' : text, 'timeStamp' : DateTime.now()});
+    await FirestoreCollection.postUpdate.add(
+        {'postImage': null, 'postText': text, 'timeStamp': DateTime.now()});
   }
 
+  // only for user not admin
+  static StreamSubscription<QuerySnapshot> unreadMessageStream() {
+    return FirestoreCollection.latestMessage(OTPAuth.currentUser.uid).listen((event) {
+      if (event.documents.length == 1) {
+        MessageInfo info = MessageInfo.fromMap(event.documents[0].data);
+        ChatService.unreadStreamController.add(Map.fromEntries([
+          MapEntry(OTPAuth.currentUser.uid, info.sender != OTPAuth.currentUser.uid && !info.isRead)
+        ]));
+      }
+    });
+  }
 }

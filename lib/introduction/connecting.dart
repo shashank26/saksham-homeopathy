@@ -25,7 +25,7 @@ class _ConnectingPageState extends State<ConnectingPage> {
                 style: TextStyle(
                   color: AppColorPallete.textColor,
                   fontFamily: 'Raleway',
-                  fontSize: 20,
+                  fontSize: 16,
                   fontWeight: FontWeight.w900,
                 ),
                 textAlign: TextAlign.center,

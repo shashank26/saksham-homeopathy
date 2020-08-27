@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
-import 'package:saksham_homeopathy/home/addMedicine.dart';
-import 'package:saksham_homeopathy/home/medicineHistoryTile.dart';
+import 'package:saksham_homeopathy/home/history/addMedicine.dart';
+import 'package:saksham_homeopathy/home/history/medicineHistoryTile.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
 
 class HistoryView extends StatefulWidget {

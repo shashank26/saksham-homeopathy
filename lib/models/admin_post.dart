@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class AdminPost {
   String imageName;
@@ -35,6 +36,13 @@ class AdminPost {
     }
   }
 
+  String getTimestamp() {
+    if (DateTime.now().difference(this._timeStamp) < Duration(days: 7)) {
+      return weekdayFormat.format(this._timeStamp);
+    }
+    return defaultForamt.format(this._timeStamp);
+  }
+
   static Map<String, dynamic> toMap(AdminPost info) {
     return {
       'text': info.text,
@@ -54,4 +62,7 @@ class AdminPost {
       timeStamp : json['timeStamp'],
     );
   }
+
+  static final DateFormat defaultForamt = DateFormat.yMd().add_jm();
+  static final DateFormat weekdayFormat = DateFormat('EEEE').add_jm();
 }

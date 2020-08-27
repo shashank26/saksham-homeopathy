@@ -1,16 +1,11 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
-import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/landing_page.dart';
-import 'package:saksham_homeopathy/services/file_handler.dart';
-import 'package:saksham_homeopathy/services/otp_auth.dart';
+import 'package:saksham_homeopathy/no_connectivity.dart';
 import 'introduction/login.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  final OTPAuth _otpAuth = OTPAuth.instantiate();
-  await FileHandler.instantiate();
+void main() {
   runApp(MaterialApp(
     theme: ThemeData(
         primaryColor: AppColorPallete.color,
@@ -28,35 +23,12 @@ void main() async {
                     : 1,
                 children: <Widget>[
                   LandingPage(),
-                  Container(
-                      color: Colors.white,
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
-                      child: Material(
-                          child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Wrap(
-                            children: <Widget>[
-                              Icon(
-                                Icons
-                                    .signal_cellular_connected_no_internet_4_bar,
-                                color: AppColorPallete.textColor,
-                                size: 50,
-                              ),
-                            ],
-                          ),
-                          HeaderText(
-                            'Please connect to internet.',
-                            size: 16,
-                          ),
-                        ],
-                      ))),
+                  NoConnectivity(),
                 ],
               );
             })),
     routes: <String, WidgetBuilder>{
-      '/login': (BuildContext context) => LoginPage(_otpAuth),
+      '/login': (BuildContext context) => LoginPage(),
     },
   ));
 }

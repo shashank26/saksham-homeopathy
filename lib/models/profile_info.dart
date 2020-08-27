@@ -1,15 +1,14 @@
 import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class ProfileInfo {
   String displayName;
-  DateTime _dateOfBirth;
+  dynamic dateOfBirth;
   String photoUrl;
   String fileName;
   File file;
   bool isAdmin;
+  String phoneNumber;
 
   static final DateFormat formatter = DateFormat('dd-MMM-yyyy');
   ProfileInfo(
@@ -18,23 +17,15 @@ class ProfileInfo {
       String photoUrl,
       String fileName,
       File file,
-      bool isAdmin}) {
+      bool isAdmin,
+      String phoneNumber}) {
     this.displayName = displayName;
     this.dateOfBirth = dateOfBirth;
     this.photoUrl = photoUrl;
     this.fileName = fileName;
     this.file = file;
     this.isAdmin = isAdmin;
-  }
-
-  DateTime get dateOfBirth => _dateOfBirth;
-
-  set dateOfBirth(dynamic dateOfBirth) {
-    if (dateOfBirth is DateTime) {
-      _dateOfBirth = dateOfBirth;
-    } else if (dateOfBirth is Timestamp) {
-      _dateOfBirth = DateTime.parse(dateOfBirth.toDate().toString());
-    }
+    this.phoneNumber = phoneNumber;
   }
 
   static Map<String, dynamic> toMap(ProfileInfo info) {
@@ -42,7 +33,8 @@ class ProfileInfo {
       'displayName': info.displayName,
       'dateOfBirth': info.dateOfBirth,
       'photoUrl': info.photoUrl,
-      'fileName': info.fileName
+      'fileName': info.fileName,
+      'phoneNumber' : info.phoneNumber,
     };
   }
 
@@ -51,6 +43,7 @@ class ProfileInfo {
         displayName: json['displayName'],
         dateOfBirth: json['dateOfBirth'],
         photoUrl: json['photoUrl'],
-        fileName: json['fileName']);
+        fileName: json['fileName'],
+        phoneNumber : json['phoneNumber']);
   }
 }
