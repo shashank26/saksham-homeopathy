@@ -306,6 +306,7 @@ class _ChatPageState extends State<ChatPage> {
                     icon: Icon(Icons.image),
                     onPressed: () async {
                       await _uploadImage(_isNewChat);
+                      widget.chatService.sendNotification('Image', widget._profileInfo.pushToken);
                     },
                   ),
                   suffixIcon: IconButton(
@@ -315,8 +316,10 @@ class _ChatPageState extends State<ChatPage> {
                       if (noe(_messageController.text)) {
                         return;
                       }
+                      final text = _messageController.text;
                       widget.chatService
-                          .sendMessage(_messageController.text, _isNewChat);
+                          .sendMessage(text, _isNewChat);
+                      widget.chatService.sendNotification(text, widget._profileInfo.pushToken);
                       _messageController.text = '';
                     },
                   ),

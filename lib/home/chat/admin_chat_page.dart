@@ -21,6 +21,9 @@ class _AdminChatPageState extends State<AdminChatPage>
           stream: ChatService.getChatListStream(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              if (snapshot.data.documents.length == 0) {
+                return Center(child : Text("No chats initiated.", style: TextStyle(color: AppColorPallete.textColor),));
+              }
               final docSnapshot = snapshot.data.documents;
               return ListView.builder(
                   itemCount: docSnapshot.length,

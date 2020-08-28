@@ -34,17 +34,6 @@ class _ProfilePageState extends State<ProfilePage> {
       FirestoreCollection.userInfo(OTPAuth.currentUser.uid);
   final _snackBarDefaultDuration = Duration(seconds: 4);
 
-  Future<bool> _getProfileInfo() async {
-    Map<String, dynamic> data =
-        FileHandler.instance.getProfileInfo(OTPAuth.currentUser.uid);
-    if (data == null) {
-      DocumentSnapshot snapshot = await _userDocRef.get();
-      data = snapshot.data;
-    }
-    _setProfileInfo(data);
-    return true;
-  }
-
   _showSnackBar(String text, {Duration duration, bool isError = false}) {
     SnackBar sb;
     if (isError) {
@@ -82,31 +71,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 _imageSource = imageSource;
               }));
       if (_imageSource != null) {
-        ProfileInfo info =
-            await ChatService.setProfilePhoto(_profileInfo, _userDocRef, () {
+       await ChatService.setProfilePhoto(_profileInfo, _userDocRef, () {
           _showSnackBar('Uploading profile photo...',
               duration: Duration(minutes: 1));
         }, _imageSource);
-        if (info != null) {
-          FileHandler.instance
-              .setProfileInfo(OTPAuth.currentUser.uid, ProfileInfo.toMap(info));
-          _hideSnackBar();
-        }
+        _hideSnackBar();
       }
     } catch (e) {
       _hideSnackBar();
       _showSnackBar('Some error occured while uploading photo.', isError: true);
     }
-  }
-
-  _setProfileInfo(Map<String, dynamic> data) {
-    _profileInfo = ProfileInfo.fromMap(data);
-    _displayNameController.text = _profileInfo.displayName;
-    _dobController.text = _profileInfo.dateOfBirth != null
-        ? ProfileInfo.formatter.format(
-            DateTime.fromMillisecondsSinceEpoch(_profileInfo.dateOfBirth))
-        : '';
-    _phoneNumberController.text = widget.user.phoneNumber;
   }
 
   _updateProfileInfo() {
@@ -117,7 +91,6 @@ class _ProfilePageState extends State<ProfilePage> {
           .millisecondsSinceEpoch;
       _profileInfo.displayName = _displayNameController.text.trim();
       Map<String, dynamic> data = ProfileInfo.toMap(_profileInfo);
-      FileHandler.instance.setProfileInfo(OTPAuth.currentUser.uid, data);
       _userDocRef.updateData(data);
       _hideSnackBar();
       _showSnackBar('Updated');
@@ -126,6 +99,16 @@ class _ProfilePageState extends State<ProfilePage> {
       _showSnackBar('Some error occured while updating profile info.',
           isError: true);
     }
+  }
+
+   _setProfileInfo(Map<String, dynamic> data) {
+    _profileInfo = ProfileInfo.fromMap(data);
+    _displayNameController.text = _profileInfo.displayName;
+    _dobController.text = _profileInfo.dateOfBirth != null
+        ? ProfileInfo.formatter.format(
+            DateTime.fromMillisecondsSinceEpoch(_profileInfo.dateOfBirth))
+        : '';
+    _phoneNumberController.text = widget.user.phoneNumber;
   }
 
   @override
@@ -147,10 +130,11 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
-      body: FutureBuilder(
-          future: _getProfileInfo(),
+      body: StreamBuilder<DocumentSnapshot>(
+          stream: FirestoreCollection.profileStream(OTPAuth.currentUser.uid),
           builder: (_, snapshot) {
             if (snapshot.hasData) {
+              _setProfileInfo(snapshot.data.data);
               return SingleChildScrollView(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),

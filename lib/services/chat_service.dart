@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/models/message_info.dart';
@@ -11,6 +12,7 @@ import 'package:saksham_homeopathy/services/otp_auth.dart';
 import 'package:saksham_homeopathy/models/message_image_info.dart';
 import 'file_handler.dart';
 import 'image_picker.dart';
+import 'package:http/http.dart' as http;
 
 class ChatService {
   String _sender;
@@ -20,6 +22,7 @@ class ChatService {
   FileHandler _fileHandler = FileHandler.instance;
   String chatId;
   static StreamController<Map<String, bool>> unreadStreamController;
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 
   ChatService(String receiver) {
     this.chatId = OTPAuth.isAdmin ? receiver : _user.uid;
@@ -43,25 +46,42 @@ class ChatService {
         .getDocuments();
   }
 
-  updateTimestamp(bool isNewChat) async {
-    await FirestoreCollection.userChatDocument(chatId)
-        .setData({'latestTimestamp': DateTime.now()});
-  }
-
   Future sendMessage(String message, bool isNewChat) async {
     MessageInfo info = MessageInfo(
         _sender, receiver, message, null, null, null, DateTime.now(), false);
     await _chatRef.add(MessageInfo.toMap(info));
-    await updateTimestamp(isNewChat);
   }
 
-  sendNotification(String message) async {
-    final data = MessageInfo.toMap(MessageInfo(_sender, receiver, message, null,
-        null, null, DateTime.now().toString(), false));
-    final res = await CloudFunctions.instance
-        .getHttpsCallable(functionName: 'sendNotification')
-        .call(data);
-    print(res);
+  sendNotification(String message, String pushToken) async {
+    final serverToken = 'AAAAIXZAUp8:APA91bHyOoGRZxlFOigzTbS828tmbgSQCH7bBnQo9Mjz2L1F8xxgMqaLcO7qhKUjjCfrxJabxsxZ8aMPx-b4V60AbF7vlm9HRQ-fRlFW6XWw0mW1Ro8mwoDAVBubNlFC1tSBsRlytRJF';
+    await http.post(
+    'https://fcm.googleapis.com/fcm/send',
+     headers: <String, String>{
+       'Content-Type': 'application/json',
+       'Authorization': 'key=$serverToken',
+     },
+     body: jsonEncode(
+     <String, dynamic>{
+       'notification': <String, dynamic>{
+         'body': message,
+         'title': OTPAuth.currentUser.phoneNumber,
+       },
+       'priority': 'high',
+       'data': <String, dynamic>{
+         'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+         'id': '1',
+         'status': 'done'
+       },
+       'to': pushToken,
+     },
+    ),
+  );
+    // final data = MessageInfo.toMap(MessageInfo(_sender, receiver, message, null,
+    //     null, null, DateTime.now().toString(), false));
+    // final res = await CloudFunctions.instance
+    //     .getHttpsCallable(functionName: 'sendNotification')
+    //     .call(data);
+    // print(res);
   }
 
   sendImage(bool isNewChat, ImageSource imageSource) async {
@@ -81,7 +101,6 @@ class ChatService {
           uploadedImages.fileName,
           DateTime.now(),
           false)));
-      await updateTimestamp(isNewChat);
     }
   }
 
@@ -92,31 +111,22 @@ class ChatService {
       ImageSource source) async {
     final images = await CImagePicker.getProfilePhoto(source, info);
     if (images != null) {
+      final oldImage = info.fileName;
+      final oldFile = info.file;
       images.fileName = ImagePath.profilePhotoPath(userDocRef.documentID);
       uploadStarted();
       ProfileInfo uploadedImages =
           await FileHandler.instance.uploadProfilePhoto(images);
       imageCache.clear();
       await userDocRef.updateData(ProfileInfo.toMap(uploadedImages));
+      if (!noe(oldImage) && oldFile != null) {
+        await FileHandler.instance.deleteCloudFile(oldImage);
+        FileHandler.instance.deleteRaw(oldFile);
+      }
       return uploadedImages;
     }
     return null;
   }
-
-  // static Future<ProfileInfo> setProfilePhoto(ProfileInfo info,
-  //     DocumentReference userDocRef, Function uploadStarted) async {
-  //   final images = await CImagePicker.getProfilePhoto(ImageSource.camera, info);
-  //   if (images != null) {
-  //     images.fileName = ImagePath.profilePhotoPath(userDocRef.documentID);
-  //     uploadStarted();
-  //     ProfileInfo uploadedImages =
-  //         await FileHandler.instance.uploadProfilePhoto(images);
-  //     imageCache.clear();
-  //     await userDocRef.updateData(ProfileInfo.toMap(uploadedImages));
-  //     return uploadedImages;
-  //   }
-  //   return null;
-  // }
 
   MessageInfo getMessageInfo(AsyncSnapshot<dynamic> snapshot, index) {
     return MessageInfo.fromMap(snapshot.data.documents[index].data);

@@ -35,7 +35,6 @@ class FileHandler {
   Future<ProfileInfo> uploadProfilePhoto(ProfileInfo file,
       {Function callBack}) async {
     file.photoUrl = await _uploadFile(file.file, file.fileName);
-    await writeFile(file.file, file.fileName);
     return file;
   }
 
@@ -53,6 +52,10 @@ class FileHandler {
     return await snapshot.ref.getDownloadURL();
   }
 
+  Future deleteCloudFile(String fileName) async {
+    await _storage.ref().child(fileName).delete();
+  }
+
   Future<File> writeFile(File file, String fileName) async {
     final path = '$applicationDirectoryPath/$fileName';
     File image = File(path);
@@ -68,21 +71,6 @@ class FileHandler {
       img = await writeFile(info.file, fileName);
     }
     return img;
-  }
-
-  Map<String, dynamic> getProfileInfo(String uid) {
-    File profileInfo =
-        this.getRawFile(fileName: LocalStorage.profileStorage(uid));
-    if (profileInfo == null) {
-      return null;
-    }
-    return json.decode(profileInfo.readAsStringSync());
-  }
-
-  void setProfileInfo(String uid, Map<String, dynamic> profileInfo) {
-    final path =
-        '$applicationDirectoryPath/${LocalStorage.profileStorage(uid)}';
-    this.writeRawFile(path, json: json.encode(profileInfo));
   }
 
   void writeRawFile(String fileName, {List<int> bytes, String json}) {
@@ -112,32 +100,6 @@ class FileHandler {
     }
   }
 
-  void saveChat(List<Map<String, dynamic>> messages, uid) {
-    File f = File('$applicationDirectoryPath/${LocalStorage.chatStorage(uid)}');
-    if (!f.existsSync()) {
-      f.createSync(recursive: true);
-    }
-    f.writeAsStringSync(jsonEncode(messages));
-  }
-
-  List<dynamic> getChatFileData(String uid) {
-    File f = File('$applicationDirectoryPath/${LocalStorage.chatStorage(uid)}');
-    if (f.existsSync()) {
-      return jsonDecode(f.readAsStringSync());
-    }
-    return null;
-    //   Directory dir = Directory(
-    //       '$_applicationDirectoryPath/${LocalStorage.chatStorage(uid)}');
-    //   if (!dir.existsSync()) {
-    //     dir.createSync(recursive: true);
-    //   }
-    //   List<File> chatFiles = dir.listSync().where((element) => element is File);
-    // return chatFiles.length == 0 ? []
-    //   chatFiles.sort(
-    //       (f1, f2) => f1.lastModifiedSync().isBefore(f2.lastModifiedSync()) ? 0 : 1);
-    //       chatFiles.length == 0
-  }
-
   String getFileName({String path, File file}) {
     if (file != null) {
       path = file.path;
@@ -148,14 +110,6 @@ class FileHandler {
   void deleteRaw(File file) {
     file.deleteSync();
   }
-
-  // File deleteCloud(String fileName) {
-  //   File img = File(fileName);
-  //   if (!img.existsSync()) {
-  //     return null;
-  //   }
-  //   return img;
-  // }
 
   bool exists({String fileName, String full}) {
     File img;

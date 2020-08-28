@@ -9,6 +9,7 @@ class ProfileInfo {
   File file;
   bool isAdmin;
   String phoneNumber;
+  String pushToken;
 
   static final DateFormat formatter = DateFormat('dd-MMM-yyyy');
   ProfileInfo(
@@ -18,7 +19,8 @@ class ProfileInfo {
       String fileName,
       File file,
       bool isAdmin,
-      String phoneNumber}) {
+      String phoneNumber,
+      String pushToken}) {
     this.displayName = displayName;
     this.dateOfBirth = dateOfBirth;
     this.photoUrl = photoUrl;
@@ -26,6 +28,7 @@ class ProfileInfo {
     this.file = file;
     this.isAdmin = isAdmin;
     this.phoneNumber = phoneNumber;
+    this.pushToken = pushToken;
   }
 
   static Map<String, dynamic> toMap(ProfileInfo info) {
@@ -44,6 +47,7 @@ class ProfileInfo {
         dateOfBirth: json['dateOfBirth'],
         photoUrl: json['photoUrl'],
         fileName: json['fileName'],
-        phoneNumber : json['phoneNumber']);
+        phoneNumber : json['phoneNumber'],
+        pushToken: json['pushToken']);
   }
 }

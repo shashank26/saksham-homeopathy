@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/typedefs.dart';
 import 'package:saksham_homeopathy/models/profile_info.dart';
+import 'package:saksham_homeopathy/services/push_notification.dart';
 
 class OTPAuth {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
@@ -42,6 +43,7 @@ class OTPAuth {
     await firestore.collection('users').document(user.uid).setData(
         ProfileInfo.toMap(
             ProfileInfo(displayName: '', dateOfBirth: null, photoUrl: '', fileName: '', phoneNumber: user.phoneNumber)));
+    PushNotification.registerNotification();
   }
 
   Future authenticate(String phoneNumber, AuthCallBack authCallBack) async {

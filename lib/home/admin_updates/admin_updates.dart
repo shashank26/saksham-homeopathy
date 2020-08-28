@@ -143,7 +143,7 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                                           },
                                           text: _post.text,
                                           style: TextStyle(
-                                              color: Colors.grey[850])),
+                                              color: AppColorPallete.textColor)),
                                     ),
                                   ),
                                   Visibility(

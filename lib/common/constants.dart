@@ -17,7 +17,7 @@ class LocalStorage {
 }
 
 class ImagePath {
-  static final profilePhotoPath = (String uid) => 'photoUrl/$uid/profilePhoto.png';
+  static final profilePhotoPath = (String uid) => 'photoUrl/$uid/${Uuid().v1()}.png';
   static final imageMessagePath =
       (String uid) => 'messages/$uid/${Uuid().v1()}.png';
       static final imagePostPath =
