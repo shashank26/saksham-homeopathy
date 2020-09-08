@@ -10,7 +10,7 @@ import 'package:saksham_homeopathy/models/profile_info.dart';
 
 class FileHandler {
   final FirebaseStorage _storage =
-      FirebaseStorage(storageBucket: 'gs://flutter-learn-3fcb5.appspot.com');
+      FirebaseStorage(storageBucket: 'gs://saksham-homeopathy.appspot.com');
   String applicationDirectoryPath;
   DefaultCacheManager _cacheManager;
   static FileHandler instance;

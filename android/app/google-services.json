@@ -1,34 +1,42 @@
 {
   "project_info": {
-    "project_number": "143717847711",
-    "firebase_url": "https://flutter-learn-3fcb5.firebaseio.com",
-    "project_id": "flutter-learn-3fcb5",
-    "storage_bucket": "flutter-learn-3fcb5.appspot.com"
+    "project_number": "370359903366",
+    "firebase_url": "https://saksham-homeopathy.firebaseio.com",
+    "project_id": "saksham-homeopathy",
+    "storage_bucket": "saksham-homeopathy.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:143717847711:android:83e428749196f2e575c8aa",
+        "mobilesdk_app_id": "1:370359903366:android:0c7c66e015cc445fb91d07",
         "android_client_info": {
-          "package_name": "com.sakshamglobalclinic.saksham_homeopathy"
+          "package_name": "com.ibis.saksham_homeopathy"
         }
       },
       "oauth_client": [
         {
-          "client_id": "143717847711-capl0tul9qt4l1s8igi6mrtnri7mribq.apps.googleusercontent.com",
+          "client_id": "370359903366-i3q3k1i95kpt0k29vooiojinaa0g2k3s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ibis.saksham_homeopathy",
+            "certificate_hash": "e36ac83461707512ad4c10a35f3041a210bc1db5"
+          }
+        },
+        {
+          "client_id": "370359903366-95idlir55qgglagovnq644khs1irnvf8.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB2xR2RkRHnF6jecFt-TnlvqxYtKK13Tn0"
+          "current_key": "AIzaSyCXvSKYjmBc-OSJJqnzP0JXHEKAURwq7-0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "143717847711-capl0tul9qt4l1s8igi6mrtnri7mribq.apps.googleusercontent.com",
+              "client_id": "370359903366-95idlir55qgglagovnq644khs1irnvf8.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
