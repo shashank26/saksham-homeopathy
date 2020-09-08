@@ -13,7 +13,9 @@ class PreviewProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColorPallete.color,
       appBar: AppBar(
+        backgroundColor: AppColorPallete.backgroundColor,
         iconTheme: IconThemeData(color: AppColorPallete.textColor),
         title: HeaderText('Profile Info'),
       ),
@@ -71,7 +73,7 @@ class PreviewProfile extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 50),
                 child: Material(
                   elevation: 5,
-                  color: AppColorPallete.color,
+                  color: AppColorPallete.backgroundColor,
                   child: Padding(
                     padding: EdgeInsets.all(10),
                     child: Column(

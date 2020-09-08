@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
@@ -22,7 +21,6 @@ class ChatService {
   FileHandler _fileHandler = FileHandler.instance;
   String chatId;
   static StreamController<Map<String, bool>> unreadStreamController;
-  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 
   ChatService(String receiver) {
     this.chatId = OTPAuth.isAdmin ? receiver : _user.uid;

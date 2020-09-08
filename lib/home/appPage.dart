@@ -45,19 +45,23 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
         ProfilePage(),
       ];
     } else {
-      ChatService.getUserInfo(OTPAuth.adminId).first.then((value) {
+      ChatService.getUserInfo(OTPAuth.adminId).listen((value) {
         setState(() {
-          this.widgets = <Widget>[
-            AdminUpdates(),
-            ChatPage(new ChatService(OTPAuth.adminId),
-                ProfileInfo.fromMap(value.data), _isVisible.stream)
-            ,
-            HistoryView(user: widget.user, uid: widget.user.uid),
-            ProfilePage(),
-          ];
+          if (this.widgets.length == 0) {
+            this.widgets = <Widget>[
+              AdminUpdates(),
+              ChatPage(new ChatService(OTPAuth.adminId),
+                  ProfileInfo.fromMap(value.data), _isVisible.stream),
+              HistoryView(user: widget.user, uid: widget.user.uid),
+              ProfilePage(),
+            ];
+          } else {
+            this.widgets[1] = ChatPage(new ChatService(OTPAuth.adminId),
+                  ProfileInfo.fromMap(value.data), _isVisible.stream);
+          }
         });
-        _isVisible.add(false);
       });
+      _isVisible.add(false);
     }
     _animationController.forward();
   }

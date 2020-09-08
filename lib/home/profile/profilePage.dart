@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:saksham_homeopathy/common/CTextFormField.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
+import 'package:saksham_homeopathy/common/custom_dialog.dart';
 import 'package:saksham_homeopathy/common/date_dialog.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/common/image_source_bottom_sheet.dart';
@@ -12,6 +13,7 @@ import 'package:saksham_homeopathy/introduction/connecting.dart';
 import 'package:saksham_homeopathy/models/profile_info.dart';
 import 'package:saksham_homeopathy/services/chat_service.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
+import 'package:saksham_homeopathy/services/push_notification.dart';
 
 class ProfilePage extends StatefulWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -70,7 +72,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 _imageSource = imageSource;
               }));
       if (_imageSource != null) {
-       await ChatService.setProfilePhoto(_profileInfo, _userDocRef, () {
+        await ChatService.setProfilePhoto(_profileInfo, _userDocRef, () {
           _showSnackBar('Uploading profile photo...',
               duration: Duration(minutes: 1));
         }, _imageSource);
@@ -100,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-   _setProfileInfo(Map<String, dynamic> data) {
+  _setProfileInfo(Map<String, dynamic> data) {
     _profileInfo = ProfileInfo.fromMap(data);
     _displayNameController.text = _profileInfo.displayName;
     _dobController.text = _profileInfo.dateOfBirth != null
@@ -271,7 +273,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       color: AppColorPallete.color,
                                       minWidth: double.infinity,
                                       elevation: 0,
-                                      textColor: AppColorPallete.backgroundColor,
+                                      textColor:
+                                          AppColorPallete.backgroundColor,
                                       padding:
                                           EdgeInsets.symmetric(vertical: 15),
                                       onPressed: () async {
@@ -293,7 +296,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                       padding:
                                           EdgeInsets.symmetric(vertical: 15),
                                       onPressed: () async {
-                                        widget._auth.signOut();
+                                        _showSnackBar('Logging out...');
+                                        await PushNotification.firebaseMessaging
+                                            .deleteInstanceID();
+                                        await widget._auth.signOut();
                                       },
                                       child: Text('Logout'),
                                     ),

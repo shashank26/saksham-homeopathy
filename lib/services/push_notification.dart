@@ -9,15 +9,16 @@ class PushNotification {
   static final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 
   static void registerNotification() {
-    
     firebaseMessaging.requestNotificationPermissions();
 
     firebaseMessaging.configure(onMessage: (Map<String, dynamic> message) {
+      if (OTPAuth.currentUser != null) {
+        print('onMessage: $message');
+        Platform.isAndroid
+            ? print(message['notification'])
+            : print(message['aps']['alert']);
+      }
       
-      print('onMessage: $message');
-      Platform.isAndroid
-          ? print(message['notification'])
-          : print(message['aps']['alert']);
       return;
     }, onResume: (Map<String, dynamic> message) {
       print('onResume: $message');

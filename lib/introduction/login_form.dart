@@ -106,6 +106,13 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
             maxLength: 10,
+            onChanged: (value) {
+              if (_loginState != LoginState.verficationStart) {
+                setState(() {
+                  _loginState = LoginState.verficationStart;
+                });
+              }
+            },
             validator: (value) {
               if (value.isEmpty) {
                 return 'Please enter a phone number';
