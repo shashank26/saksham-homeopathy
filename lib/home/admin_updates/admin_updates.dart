@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -7,8 +9,10 @@ import 'package:saksham_homeopathy/common/custom_dialog.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/common/network_or_file_image.dart';
 import 'package:saksham_homeopathy/home/admin_updates/add_post.dart';
+import 'package:saksham_homeopathy/home/profile/preview_profile.dart';
 import 'package:saksham_homeopathy/home/profile/profile_avatar.dart';
 import 'package:saksham_homeopathy/models/admin_post.dart';
+import 'package:saksham_homeopathy/models/profile_info.dart';
 import 'package:saksham_homeopathy/services/file_handler.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -60,7 +64,8 @@ class _AdminUpdatesState extends State<AdminUpdates> {
         context: context,
         child: Scaffold(
             appBar: AppBar(
-              iconTheme: IconThemeData(color: Colors.white),
+              backgroundColor: AppColorPallete.backgroundColor,
+              iconTheme: IconThemeData(color: AppColorPallete.textColor),
               title: HeaderText(
                 'Add Post',
                 size: 40,
@@ -69,13 +74,35 @@ class _AdminUpdatesState extends State<AdminUpdates> {
             body: AddPost(context, post)));
   }
 
+  _previewProfile(ProfileInfo info) {
+    showDialog(
+        context: context,
+        builder: (BuildContext bc) {
+          return PreviewProfile(info);
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColorPallete.color,
       appBar: AppBar(
+        backgroundColor: AppColorPallete.backgroundColor,
+        leading: GestureDetector(
+          onTap: () {
+            _previewProfile(OTPAuth.adminProfile);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ProfileAvatar(
+              OTPAuth.adminId,
+              showName: false,
+            ),
+          ),
+        ),
         title: Container(
             width: double.maxFinite,
-            color: AppColorPallete.color,
+            color: AppColorPallete.backgroundColor,
             child: HeaderText(
               "Updates",
               align: TextAlign.left,
@@ -102,12 +129,6 @@ class _AdminUpdatesState extends State<AdminUpdates> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            Material(
-                elevation: 5,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ProfileAvatar(OTPAuth.adminId),
-                )),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirestoreCollection.adminUpdates.snapshots(),
@@ -143,7 +164,9 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                                           },
                                           text: _post.text,
                                           style: TextStyle(
-                                              color: AppColorPallete.textColor)),
+                                              color: AppColorPallete.textColor,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                   ),
                                   Visibility(
@@ -154,7 +177,9 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                                             context: context,
                                             builder: (context) {
                                               return Scaffold(
-                                                appBar: AppBar(),
+                                                appBar: AppBar(
+                                                  iconTheme: IconThemeData(color: AppColorPallete.textColor),
+                                                ),
                                                 body: Container(
                                                   child: PhotoView(
                                                       imageProvider: FileImage(

@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 class MedicineInfo {
   String _name;
   String _dosage;
-  String _datePrescribed;
+  int _datePrescribed;
   String _uid;
   final DateFormat _formatter = DateFormat('dd-MMM-yyyy');
 
@@ -19,7 +19,10 @@ class MedicineInfo {
   String get uid => _uid;
   String get name => _name;
   String get dosage => _dosage;
-  String get datePrescribed => _datePrescribed;
+
+  String getDatePrescribed() {
+    return _formatter.format(DateTime.fromMillisecondsSinceEpoch(_datePrescribed));
+  }
 
   set name(value) {
     _name = value;
@@ -33,15 +36,15 @@ class MedicineInfo {
     _dosage = value;
   }
 
-  set datePrescribed(value) {
-    _datePrescribed = _formatter.format(value);
+  set datePrescribed(int value) {
+    _datePrescribed = value;
   }
 
   static Map<String, dynamic> toMap(MedicineInfo info) {
     return {
       'name': info.name,
       'dosage': info.dosage,
-      'datePrescribed': info.datePrescribed,
+      'datePrescribed': info._datePrescribed,
       'uid' : info.uid
     };
   }

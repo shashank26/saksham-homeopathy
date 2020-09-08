@@ -47,17 +47,21 @@ class _ChatPageState extends State<ChatPage> {
     if (vis == null && widget._isVisibleStream != null) {
       unread = ChatService.unreadMessageStream();
       vis = widget._isVisibleStream.listen((event) {
+        bool isRunning() => ss != null && !ss.isPaused;
         if (event) {
-          shouldScroll = true;
           if (ss == null) {
             initChatStream();
-          } else {
-            ss.resume();
+            Future.delayed(Duration(milliseconds: 100)).then((f) {
+              unread.pause();
+            });
           }
-          Future.delayed(Duration(seconds: 1)).then((f) {
-            unread.pause();
-          });
-        } else if (ss != null) {
+          if (!isRunning()) {
+            ss.resume();
+            Future.delayed(Duration(seconds: 100)).then((f) {
+              unread.pause();
+            });
+          }
+        } else if (isRunning()) {
           ss.pause();
           unread.resume();
         }
@@ -142,13 +146,7 @@ class _ChatPageState extends State<ChatPage> {
     showDialog(
         context: context,
         builder: (BuildContext bc) {
-          return Scaffold(
-            appBar: AppBar(
-              // backgroundColor: Colors.white,
-              iconTheme: IconThemeData(color: AppColorPallete.backgroundColor),
-            ),
-            body: HistoryView(uid: widget.chatService.receiver),
-          );
+          return HistoryView(uid: widget.chatService.receiver);
         });
   }
 
@@ -156,13 +154,7 @@ class _ChatPageState extends State<ChatPage> {
     showDialog(
         context: context,
         builder: (BuildContext bc) {
-          return Scaffold(
-            appBar: AppBar(
-              // backgroundColor: Colors.white,
-              iconTheme: IconThemeData(color: AppColorPallete.backgroundColor),
-            ),
-            body: PreviewProfile(widget._profileInfo),
-          );
+          return PreviewProfile(widget._profileInfo);
         });
   }
 
@@ -196,6 +188,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(color: AppColorPallete.textColor),
         actions: [
           if (OTPAuth.isAdmin)
             IconButton(
@@ -306,7 +299,8 @@ class _ChatPageState extends State<ChatPage> {
                     icon: Icon(Icons.image),
                     onPressed: () async {
                       await _uploadImage(_isNewChat);
-                      widget.chatService.sendNotification('Image', widget._profileInfo.pushToken);
+                      widget.chatService.sendNotification(
+                          'Image', widget._profileInfo.pushToken);
                     },
                   ),
                   suffixIcon: IconButton(
@@ -317,9 +311,9 @@ class _ChatPageState extends State<ChatPage> {
                         return;
                       }
                       final text = _messageController.text;
-                      widget.chatService
-                          .sendMessage(text, _isNewChat);
-                      widget.chatService.sendNotification(text, widget._profileInfo.pushToken);
+                      widget.chatService.sendMessage(text, _isNewChat);
+                      widget.chatService.sendNotification(
+                          text, widget._profileInfo.pushToken);
                       _messageController.text = '';
                     },
                   ),

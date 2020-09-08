@@ -11,7 +11,6 @@ import 'package:saksham_homeopathy/common/network_or_file_image.dart';
 import 'package:saksham_homeopathy/introduction/connecting.dart';
 import 'package:saksham_homeopathy/models/profile_info.dart';
 import 'package:saksham_homeopathy/services/chat_service.dart';
-import 'package:saksham_homeopathy/services/file_handler.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -109,6 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
             DateTime.fromMillisecondsSinceEpoch(_profileInfo.dateOfBirth))
         : '';
     _phoneNumberController.text = widget.user.phoneNumber;
+    OTPAuth.currentUserProfile = _profileInfo;
   }
 
   @override
@@ -119,10 +119,12 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColorPallete.color,
       appBar: AppBar(
+        backgroundColor: AppColorPallete.backgroundColor,
         title: Container(
           width: double.maxFinite,
-          color: AppColorPallete.color,
+          color: AppColorPallete.backgroundColor,
           child: HeaderText(
             "Profile",
             align: TextAlign.left,
@@ -179,7 +181,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   color: Colors.grey,
                                                 )
                                               ],
-                                              color: AppColorPallete.color,
+                                              color: Colors.white,
                                               borderRadius:
                                                   BorderRadius.circular(15)),
                                           child: Icon(
@@ -198,7 +200,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             horizontal: 8.0, vertical: 50),
                         child: Material(
                           elevation: 5,
-                          color: AppColorPallete.color,
+                          color: Colors.white,
                           child: Form(
                             key: _formKey,
                             child: Padding(
@@ -266,10 +268,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                   Container(
                                     margin: EdgeInsetsDirectional.only(top: 15),
                                     child: MaterialButton(
-                                      color: Colors.white,
+                                      color: AppColorPallete.color,
                                       minWidth: double.infinity,
                                       elevation: 0,
-                                      textColor: AppColorPallete.color,
+                                      textColor: AppColorPallete.backgroundColor,
                                       padding:
                                           EdgeInsets.symmetric(vertical: 15),
                                       onPressed: () async {
@@ -284,7 +286,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   Container(
                                     margin: EdgeInsetsDirectional.only(top: 15),
                                     child: MaterialButton(
-                                      color: Colors.redAccent,
+                                      color: Colors.grey,
                                       minWidth: double.infinity,
                                       elevation: 0,
                                       textColor: Colors.white,

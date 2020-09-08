@@ -8,7 +8,8 @@ import 'package:saksham_homeopathy/services/chat_service.dart';
 
 class ProfileAvatar extends StatefulWidget {
   final String uid;
-  ProfileAvatar(this.uid);
+  final bool showName;
+  ProfileAvatar(this.uid, {this.showName = true});
 
   @override
   _ProfileAvatarState createState() => _ProfileAvatarState();
@@ -36,6 +37,7 @@ class _ProfileAvatarState extends State<ProfileAvatar> {
                     ),
                   ),
                 ),
+                if (widget.showName)
                 Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Column(

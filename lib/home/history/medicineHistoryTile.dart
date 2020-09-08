@@ -9,10 +9,75 @@ class HistoryTile extends StatelessWidget {
   final DocumentSnapshot info;
   HistoryTile(this.info);
 
+  _deleteHandler(context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: HeaderText('Delete'),
+            content: Text(
+              'Delete this medicine from the list?',
+              textAlign: TextAlign.center,
+            ),
+            actions: <Widget>[
+              FlatButton(
+                textColor: Colors.redAccent,
+                child: Text('Delete'),
+                onPressed: () async {
+                  showDialog(
+                      context: context, child: CustomDialog('Deleting...'));
+                  await info.reference.delete();
+                  int count = 0;
+                  Navigator.popUntil(context, (route) {
+                    return count++ == 2;
+                  });
+                },
+              ),
+              FlatButton(
+                textColor: Colors.black,
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     MedicineInfo mInfo = MedicineInfo.fromMap(info.data);
-    return Material(
+    return MaterialButton(
+      color: Colors.white,
+      onPressed: () {},
+      onLongPress: () async {
+        if (OTPAuth.isAdmin) {
+          return;
+        }
+        await showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return Container(
+                height: 100,
+                child: Column(
+                  children: [
+                    FlatButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _deleteHandler(context);
+                        },
+                        child: Text("Delete")),
+                    FlatButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text("Cancel")),
+                  ],
+                ),
+              );
+            });
+      },
       elevation: 5,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -22,17 +87,17 @@ class HistoryTile extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: <Widget>[
-                    HeaderText(mInfo.datePrescribed, size: 20),
+                    HeaderText(mInfo.name, size: 20),
                     Row(
                       mainAxisSize: MainAxisSize.max,
                       // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text(
-                          'Name: ',
+                          'Date: ',
                           style: TextStyle(fontSize: 16),
                         ),
                         Text(
-                          mInfo.name,
+                          mInfo.getDatePrescribed(),
                           style: TextStyle(
                               fontStyle: FontStyle.italic, fontSize: 16),
                         )
@@ -54,54 +119,6 @@ class HistoryTile extends StatelessWidget {
                       ],
                     ),
                   ],
-                ),
-              ),
-              Visibility(
-                visible: !OTPAuth.isAdmin,
-                child: Container(
-                  width: 50,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.delete,
-                      color: Colors.redAccent,
-                    ),
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: HeaderText('Delete'),
-                              content: Text(
-                                'Delete this medicine from the list?',
-                                textAlign: TextAlign.center,
-                              ),
-                              actions: <Widget>[
-                                FlatButton(
-                                  textColor: Colors.redAccent,
-                                  child: Text('Delete'),
-                                  onPressed: () async {
-                                    showDialog(
-                                        context: context,
-                                        child: CustomDialog('Deleting...'));
-                                    await info.reference.delete();
-                                    int count = 0;
-                                    Navigator.popUntil(context, (route) {
-                                      return count++ == 2;
-                                    });
-                                  },
-                                ),
-                                FlatButton(
-                                  textColor: Colors.black,
-                                  child: Text('Cancel'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            );
-                          });
-                    },
-                  ),
                 ),
               ),
             ]),

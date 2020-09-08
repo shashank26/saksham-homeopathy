@@ -68,6 +68,7 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
       _animationController.forward();
       _currentIndex = index;
     });
+    FocusScope.of(context).unfocus();
   }
 
   @override

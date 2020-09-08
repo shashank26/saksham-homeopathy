@@ -1,8 +1,5 @@
-import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:saksham_homeopathy/services/otp_auth.dart';
 import 'package:uuid/uuid.dart';
 
 class AppColorPallete {
@@ -25,7 +22,7 @@ class ImagePath {
 }
 
 class FirestoreCollection {
-  static final addMedicine = Firestore.instance.collection('medicines');
+  static final addMedicine = (String uid) => Firestore.instance.collection('medicines').document(uid).collection('medicines');
   static final chat = (String uid) => Firestore.instance
       .collection('messages')
       .document(uid)

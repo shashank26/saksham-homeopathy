@@ -46,15 +46,22 @@ class ChatService {
         .getDocuments();
   }
 
+  updateTimestamp(bool isNewChat) async {
+    await FirestoreCollection.userChatDocument(chatId)
+        .setData({'latestTimestamp': DateTime.now()});
+  }
+
   Future sendMessage(String message, bool isNewChat) async {
     MessageInfo info = MessageInfo(
         _sender, receiver, message, null, null, null, DateTime.now(), false);
     await _chatRef.add(MessageInfo.toMap(info));
+    await updateTimestamp(isNewChat);
   }
 
-  sendNotification(String message, String pushToken) async {
+  sendNotification(String message, String token, {bool isEmergency = false}) async {
+    try {
     final serverToken = 'AAAAIXZAUp8:APA91bHyOoGRZxlFOigzTbS828tmbgSQCH7bBnQo9Mjz2L1F8xxgMqaLcO7qhKUjjCfrxJabxsxZ8aMPx-b4V60AbF7vlm9HRQ-fRlFW6XWw0mW1Ro8mwoDAVBubNlFC1tSBsRlytRJF';
-    await http.post(
+    final response =  await http.post(
     'https://fcm.googleapis.com/fcm/send',
      headers: <String, String>{
        'Content-Type': 'application/json',
@@ -64,7 +71,7 @@ class ChatService {
      <String, dynamic>{
        'notification': <String, dynamic>{
          'body': message,
-         'title': OTPAuth.currentUser.phoneNumber,
+         'title': '${OTPAuth.currentUserProfile.displayName} (${OTPAuth.currentUser.phoneNumber})',
        },
        'priority': 'high',
        'data': <String, dynamic>{
@@ -72,16 +79,14 @@ class ChatService {
          'id': '1',
          'status': 'done'
        },
-       'to': pushToken,
+       'to': token,
      },
     ),
   );
-    // final data = MessageInfo.toMap(MessageInfo(_sender, receiver, message, null,
-    //     null, null, DateTime.now().toString(), false));
-    // final res = await CloudFunctions.instance
-    //     .getHttpsCallable(functionName: 'sendNotification')
-    //     .call(data);
-    // print(res);
+  print(response);
+    } on Exception catch (ex) {
+      print(ex);
+    }
   }
 
   sendImage(bool isNewChat, ImageSource imageSource) async {
@@ -102,6 +107,7 @@ class ChatService {
           DateTime.now(),
           false)));
     }
+    await updateTimestamp(isNewChat);
   }
 
   static Future<ProfileInfo> setProfilePhoto(

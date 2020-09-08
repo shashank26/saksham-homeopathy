@@ -5,6 +5,7 @@ import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/date_dialog.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/models/medicine_info.dart';
+import 'package:saksham_homeopathy/services/otp_auth.dart';
 
 class AddMedicineForm extends StatelessWidget {
   final _dateController = new TextEditingController(text: '');
@@ -57,8 +58,8 @@ class AddMedicineForm extends StatelessWidget {
                       firstDate: DateTime.now().subtract(Duration(days: 365)),
                       lastDate: DateTime.now().add(Duration(days: 365)));
                   if (dateSelected != null) {
-                    this._medicineInfo.datePrescribed = dateSelected;
-                    _dateController.text = this._medicineInfo.datePrescribed;
+                    this._medicineInfo.datePrescribed = dateSelected.millisecondsSinceEpoch;
+                    _dateController.text = this._medicineInfo.getDatePrescribed();
                   }
                 },
               ),
@@ -74,7 +75,7 @@ class AddMedicineForm extends StatelessWidget {
                   content: Text('Adding medicine to the list.'),
                 ));
                 _medicineInfo.uid = user.uid;
-                await FirestoreCollection.addMedicine
+                await FirestoreCollection.addMedicine(OTPAuth.currentUser.uid)
                     .add(MedicineInfo.toMap(_medicineInfo));
                 Scaffold.of(context).hideCurrentSnackBar();
                 _nameController.text = '';

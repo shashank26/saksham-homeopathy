@@ -51,7 +51,9 @@ class MessageBubble extends StatelessWidget {
                                       context: context,
                                       builder: (context) {
                                         return Scaffold(
-                                          appBar: AppBar(),
+                                          appBar: AppBar(
+                                            iconTheme: IconThemeData(color: AppColorPallete.textColor),
+                                          ),
                                           body: Container(
                                             child: PhotoView(
                                                 imageProvider: FileImage(
@@ -80,6 +82,9 @@ class MessageBubble extends StatelessWidget {
                                 }
                               },
                               text: info.message,
+                              style: TextStyle(
+                                fontSize: 18
+                              ),
                             ),
                       if (info.sender == user.uid)
                         Container(

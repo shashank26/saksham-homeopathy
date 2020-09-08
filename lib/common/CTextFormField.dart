@@ -8,14 +8,18 @@ class CTextFormField extends StatefulWidget {
   final Widget prefixIcon;
   final Widget suffixIcon;
   final void Function() onTap;
+  final void Function(String) onChanged;
   final TextEditingController controller;
   final bool enabled;
   final Widget prefix;
   final Widget suffixWidget;
   final int maxChars;
+  final FloatingLabelBehavior floatingLabelBehavior;
+  final bool autoFocus;
 
   CTextFormField(
-      {this.enabled,
+      {this.autoFocus = false,
+      this.enabled,
       this.controller,
       this.onTap,
       this.labelText,
@@ -24,7 +28,9 @@ class CTextFormField extends StatefulWidget {
       this.prefixIcon,
       this.suffixIcon,
       this.prefix,
+      this.onChanged,
       this.suffixWidget,
+      this.floatingLabelBehavior = FloatingLabelBehavior.never,
       this.maxChars});
 
   @override
@@ -39,27 +45,30 @@ class _CTextFormFieldState extends State<CTextFormField> {
     return Focus(
       onFocusChange: (hasFocus) {
         setState(() {
-          _hasFocus = hasFocus;
+          // _hasFocus = hasFocus;
         });
       },
       child: Material(
-        elevation: _hasFocus ? 5 : 2,
+        elevation: _hasFocus ? 10 : 5,
         shadowColor: Color.fromARGB(255, 220, 220, 220),
         child: TextFormField(
+          autofocus: widget.autoFocus,
           onSaved: widget.onSaved,
           enabled: widget.enabled,
+          onChanged: widget.onChanged,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             filled: true,
             fillColor: Colors.white,
             prefix: widget.prefix,
-            floatingLabelBehavior: FloatingLabelBehavior.never,
+            floatingLabelBehavior: widget.floatingLabelBehavior,
             labelText: widget.labelText,
             border: OutlineInputBorder(borderSide: BorderSide.none),
             prefixIcon: widget.prefixIcon,
             suffixIcon: widget.suffixIcon,
             suffix: widget.suffixWidget,
           ),
+          style: TextStyle(fontSize: 18),
           maxLength: widget.maxChars,
           validator: widget.validator,
           onTap: widget.onTap,

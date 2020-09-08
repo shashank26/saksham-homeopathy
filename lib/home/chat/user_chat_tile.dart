@@ -13,7 +13,8 @@ import 'package:saksham_homeopathy/services/chat_service.dart';
 class UserChatTile extends StatefulWidget {
   final String uid;
   final CollectionReference _chatRef;
-  UserChatTile(this.uid, this._chatRef);
+  final Function(String, ProfileInfo) _callback;
+  UserChatTile(this.uid, this._chatRef, this._callback);
   @override
   _UserChatTileState createState() => _UserChatTileState();
 }
@@ -60,6 +61,7 @@ class _UserChatTileState extends State<UserChatTile> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   _profileInfo = ProfileInfo.fromMap(snapshot.data.data);
+                  widget._callback(widget.uid, _profileInfo);
                   return Row(
                     mainAxisSize: MainAxisSize.max,
                     crossAxisAlignment: CrossAxisAlignment.start,

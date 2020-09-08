@@ -19,6 +19,7 @@ class _InitializeState extends State<Initialize> {
     OTPAuth.initializeInfo().then((value) {
       setState(() {
         initialized = true;
+        PushNotification.registerNotification();
       });
     });
   }
