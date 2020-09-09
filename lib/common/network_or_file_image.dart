@@ -73,9 +73,12 @@ class _NetworkOrFileImageState extends State<NetworkOrFileImage> {
                 width: widget.width,
               );
             }
-            return CircularProgressIndicator(
+            return Container(
+              height: 30,
+              width: 30,
+              child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(AppColorPallete.color),
-            );
+            ));
           });
     } else {
       return Container();

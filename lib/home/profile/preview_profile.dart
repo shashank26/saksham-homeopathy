@@ -39,6 +39,7 @@ class PreviewProfile extends StatelessWidget {
                               builder: (context) {
                                 return Scaffold(
                                   appBar: AppBar(
+                                    backgroundColor: AppColorPallete.backgroundColor,
                                     iconTheme: IconThemeData(color: AppColorPallete.textColor),
                                   ),
                                   body: Container(
@@ -82,7 +83,7 @@ class PreviewProfile extends StatelessWidget {
                         Container(
                             child: Text(
                           noe(_profileInfo.displayName)
-                              ? 'Name not updated'
+                              ? 'Name not updated!'
                               : _profileInfo.displayName,
                           style: TextStyle(
                               color: AppColorPallete.textColor,

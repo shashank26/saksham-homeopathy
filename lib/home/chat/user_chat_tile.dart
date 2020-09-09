@@ -86,9 +86,9 @@ class _UserChatTileState extends State<UserChatTile> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              HeaderText(
-                                _profileInfo.displayName,
-                                size: 15,
+                              Text(
+                                noe(_profileInfo.displayName) ? _profileInfo.phoneNumber : _profileInfo.displayName,
+                                style: TextStyle(color: AppColorPallete.textColor, fontSize: 18),
                               ),
                               LatestMessage(FirestoreCollection.latestMessage(
                                   widget.uid), widget.uid),

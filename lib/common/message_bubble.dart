@@ -52,6 +52,7 @@ class MessageBubble extends StatelessWidget {
                                       builder: (context) {
                                         return Scaffold(
                                           appBar: AppBar(
+                                            backgroundColor: AppColorPallete.backgroundColor,
                                             iconTheme: IconThemeData(color: AppColorPallete.textColor),
                                           ),
                                           body: Container(
