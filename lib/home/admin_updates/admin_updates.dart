@@ -23,6 +23,31 @@ class AdminUpdates extends StatefulWidget {
 }
 
 class _AdminUpdatesState extends State<AdminUpdates> {
+  int batch = 1;
+  int batchSize = 20;
+  final scrollController = new ScrollController();
+  bool showLoadMoreOption = false;
+  int countOfPosts = 0;
+  @override
+  initState() {
+    super.initState();
+    scrollController.addListener(() {
+      if (scrollController.offset >=
+              scrollController.position.maxScrollExtent - 20 &&
+          !showLoadMoreOption) {
+        setState(() {
+          showLoadMoreOption = true;
+        });
+      } else if (scrollController.offset <
+              scrollController.position.maxScrollExtent - 20 &&
+          showLoadMoreOption) {
+        setState(() {
+          showLoadMoreOption = false;
+        });
+      }
+    });
+  }
+
   _deleteConfirmDialog(DocumentReference ref) {
     showDialog(
         context: context,
@@ -125,20 +150,24 @@ class _AdminUpdatesState extends State<AdminUpdates> {
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
+        child: Stack(
+          // crossAxisAlignment: CrossAxisAlignment.start,
+          // mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            Expanded(
+            Container(
               child: StreamBuilder<QuerySnapshot>(
-                stream: FirestoreCollection.adminUpdates.snapshots(),
+                stream: FirestoreCollection.adminUpdates(
+                        this.batch * this.batchSize)
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.data.documents.length > 0) {
+                    this.countOfPosts = snapshot.data.documents.length;
                     return RefreshIndicator(
                       onRefresh: () async {
                         print('load more...');
                       },
                       child: ListView.builder(
+                        controller: scrollController,
                         itemCount: snapshot.data.documents.length,
                         itemBuilder: (context, index) {
                           final _post = AdminPost.fromMap(
@@ -178,8 +207,12 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                                             builder: (context) {
                                               return Scaffold(
                                                 appBar: AppBar(
-                                                  backgroundColor: AppColorPallete.backgroundColor,
-                                                  iconTheme: IconThemeData(color: AppColorPallete.textColor),
+                                                  backgroundColor:
+                                                      AppColorPallete
+                                                          .backgroundColor,
+                                                  iconTheme: IconThemeData(
+                                                      color: AppColorPallete
+                                                          .textColor),
                                                 ),
                                                 body: Container(
                                                   child: PhotoView(
@@ -272,6 +305,32 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                     );
                   }
                 },
+              ),
+            ),
+            Visibility(
+              visible: showLoadMoreOption,
+              child: Positioned(
+                bottom: 0,
+                width: MediaQuery.of(context).size.width,
+                child: Center(
+                  child: MaterialButton(
+                    color: AppColorPallete.backgroundColor,
+                    elevation: 10,
+                    onPressed: () {
+                      if (batch * batchSize <= countOfPosts) {
+                        setState(() {
+                          this.batch++;
+                        });
+                      } else {
+                          Scaffold.of(context).showSnackBar(SnackBar(content: Text('There are no more posts.')));
+                      }
+                    },
+                    child: HeaderText(
+                      'Load Older Posts',
+                      size: 14,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

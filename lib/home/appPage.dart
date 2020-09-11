@@ -45,21 +45,47 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
         ProfilePage(),
       ];
     } else {
-      ChatService.getUserInfo(OTPAuth.adminId).listen((value) {
-        setState(() {
-          if (this.widgets.length == 0) {
+      FirestoreCollection.isWhiteListed(OTPAuth.currentUser.phoneNumber)
+          .then((value) {
+        if (value.documents.length > 0) {
+          ChatService.getUserInfo(OTPAuth.adminId).listen((value) {
+            setState(() {
+              if (this.widgets.length == 0) {
+                this.widgets = <Widget>[
+                  AdminUpdates(),
+                  ChatPage(new ChatService(OTPAuth.adminId),
+                      ProfileInfo.fromMap(value.data), _isVisible.stream),
+                  HistoryView(user: widget.user, uid: widget.user.uid),
+                  ProfilePage(),
+                ];
+              } else {
+                this.widgets[1] = ChatPage(new ChatService(OTPAuth.adminId),
+                    ProfileInfo.fromMap(value.data), _isVisible.stream);
+              }
+            });
+          });
+        } else {
+          setState(() {
             this.widgets = <Widget>[
               AdminUpdates(),
-              ChatPage(new ChatService(OTPAuth.adminId),
-                  ProfileInfo.fromMap(value.data), _isVisible.stream),
+              Container(
+                child: Center(
+                  child: Align(
+                    alignment: Alignment.center,
+                      child: Text(
+                    'Please subscribe or contact your doctor to access chat.',
+                    style: TextStyle(
+                      color: AppColorPallete.textColor,
+                      fontSize: 16,
+                    ),
+                  )),
+                ),
+              ),
               HistoryView(user: widget.user, uid: widget.user.uid),
               ProfilePage(),
             ];
-          } else {
-            this.widgets[1] = ChatPage(new ChatService(OTPAuth.adminId),
-                  ProfileInfo.fromMap(value.data), _isVisible.stream);
-          }
-        });
+          });
+        }
       });
       _isVisible.add(false);
     }
@@ -67,12 +93,14 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
   }
 
   _navigate(index, {isPop = false}) {
-    _animationController.reset();
-    setState(() {
-      _animationController.forward();
-      _currentIndex = index;
-    });
-    FocusScope.of(context).unfocus();
+    if (_currentIndex != index) {
+      _animationController.reset();
+      setState(() {
+        _animationController.forward();
+        _currentIndex = index;
+      });
+      FocusScope.of(context).unfocus();
+    }
   }
 
   @override

@@ -36,9 +36,11 @@ class FirestoreCollection {
       (String uid) => Firestore.instance.collection('users').document(uid);
   static final getAdminInfo =
       () => Firestore.instance.collection('users').where('isAdmin', isEqualTo: true).snapshots().first;
-  static final adminUpdates = Firestore.instance.collection('adminUpdates').orderBy('timeStamp', descending: true);
+  static final adminUpdates = (int size) => Firestore.instance.collection('adminUpdates').limit(size).orderBy('timeStamp', descending: true);
   static final postUpdate = Firestore.instance.collection('adminUpdates');
   static final profileStream = (uid) => FirestoreCollection.userInfo(uid).snapshots();
+  static final isWhiteListed = (phoneNumber) => Firestore.instance.collection('whitelist').where('phoneNumber', isEqualTo: phoneNumber).snapshots().first;
+  static final updateRequired = () => Firestore.instance.collection('update').snapshots();
 }
 
 enum LoginState {
@@ -48,6 +50,11 @@ enum LoginState {
   verificationFailed,
   timeout,
   codeAutoRetrievalTimeout
+}
+
+enum UpdateType {
+  Recommended,
+  Required
 }
 
 enum PhotoUploadState { started, inProgress, complete }
