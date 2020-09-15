@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:saksham_homeopathy/common/constants.dart';
 
 class MessageInfo {
   String documentId;
@@ -59,7 +60,7 @@ class MessageInfo {
     return {
       'sender': info.sender,
       'receiver': info.receiver,
-      'message': info.message,
+      'message': !noe(info.message) ? AESEncryption.encrypt(info.message) : info.message,
       'blurredImage': info.blurredImage,
       'image': info.image,
       'fileName': info.fileName,
@@ -72,7 +73,7 @@ class MessageInfo {
     return new MessageInfo(
         json['sender'],
         json['receiver'],
-        json['message'],
+        !noe(json['message']) ? AESEncryption.decrypt(json['message']) : json['message'],
         json['blurredImage'],
         json['image'],
         json['fileName'],

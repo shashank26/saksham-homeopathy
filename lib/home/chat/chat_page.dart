@@ -292,30 +292,36 @@ class _ChatPageState extends State<ChatPage> {
                       spreadRadius: 2,
                       blurRadius: 5)
                 ]),
-                child: CTextFormField(
-                  maxChars: 200,
-                  controller: _messageController,
-                  prefixIcon: IconButton(
-                    icon: Icon(Icons.image),
-                    onPressed: () async {
-                      await _uploadImage(_isNewChat);
-                      widget.chatService.sendNotification(
-                          'Image', widget._profileInfo.pushToken);
-                    },
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: 100,
                   ),
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.send),
-                    onPressed: () async {
-                      // FocusScope.of(context).unfocus();
-                      if (noe(_messageController.text)) {
-                        return;
-                      }
-                      final text = _messageController.text;
-                      widget.chatService.sendMessage(text, _isNewChat);
-                      widget.chatService.sendNotification(
-                          text, widget._profileInfo.pushToken);
-                      _messageController.text = '';
-                    },
+                  child: CTextFormField(
+                    maxChars: 200,
+                    maxLines: null,
+                    controller: _messageController,
+                    prefixIcon: IconButton(
+                      icon: Icon(Icons.image),
+                      onPressed: () async {
+                        await _uploadImage(_isNewChat);
+                        widget.chatService.sendNotification(
+                            'Image', widget._profileInfo.pushToken);
+                      },
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.send),
+                      onPressed: () async {
+                        // FocusScope.of(context).unfocus();
+                        if (noe(_messageController.text)) {
+                          return;
+                        }
+                        final text = _messageController.text;
+                        widget.chatService.sendMessage(text, _isNewChat);
+                        widget.chatService.sendNotification(
+                            text, widget._profileInfo.pushToken);
+                        _messageController.text = '';
+                      },
+                    ),
                   ),
                 ),
               )

@@ -16,6 +16,7 @@ class CTextFormField extends StatefulWidget {
   final int maxChars;
   final FloatingLabelBehavior floatingLabelBehavior;
   final bool autoFocus;
+  final int maxLines;
 
   CTextFormField(
       {this.autoFocus = false,
@@ -31,7 +32,8 @@ class CTextFormField extends StatefulWidget {
       this.onChanged,
       this.suffixWidget,
       this.floatingLabelBehavior = FloatingLabelBehavior.never,
-      this.maxChars});
+      this.maxChars,
+      this.maxLines = 1});
 
   @override
   _CTextFormFieldState createState() => _CTextFormFieldState();
@@ -68,6 +70,8 @@ class _CTextFormFieldState extends State<CTextFormField> {
             suffixIcon: widget.suffixIcon,
             suffix: widget.suffixWidget,
           ),
+          minLines: 1,
+          maxLines: widget.maxLines,
           style: TextStyle(fontSize: 18),
           maxLength: widget.maxChars,
           validator: widget.validator,

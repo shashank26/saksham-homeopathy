@@ -108,14 +108,6 @@ class _AddPostState extends State<AddPost> {
                       }
                     },
                   ),
-                  // IconButton(
-                  //   icon: Icon(Icons.link, color: AppColorPallete.color),
-                  //   onPressed: () {
-                  //     setState(() {
-                  //       _addLink = !_addLink;
-                  //     });
-                  //   },
-                  // )
                 ],
               ),
               TextField(

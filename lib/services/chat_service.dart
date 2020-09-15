@@ -56,32 +56,35 @@ class ChatService {
     await updateTimestamp(isNewChat);
   }
 
-  sendNotification(String message, String token, {bool isEmergency = false}) async {
+  sendNotification(String message, String token,
+      {bool isEmergency = false}) async {
     try {
-    final serverToken = 'AAAAVjsrpIY:APA91bG_k_WlY3uAmmKln8wX3SyrU-f-Rz4sh_YLkNaoon6ckv8xLJ63f_zrMRmQsInKEPlMOt9Z8fKOObgdhsVv_hheAzivRIUeNQBNCEWWK1sTrr7TKNTKhFmvoyfU2k-pa777OcFN';
-    final response =  await http.post(
-    'https://fcm.googleapis.com/fcm/send',
-     headers: <String, String>{
-       'Content-Type': 'application/json',
-       'Authorization': 'key=$serverToken',
-     },
-     body: jsonEncode(
-     <String, dynamic>{
-       'notification': <String, dynamic>{
-         'body': message,
-         'title': '${OTPAuth.currentUserProfile.displayName} (${OTPAuth.currentUser.phoneNumber})',
-       },
-       'priority': 'high',
-       'data': <String, dynamic>{
-         'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-         'id': '1',
-         'status': 'done'
-       },
-       'to': token,
-     },
-    ),
-  );
-  print(response);
+      final serverToken =
+          'AAAAVjsrpIY:APA91bG_k_WlY3uAmmKln8wX3SyrU-f-Rz4sh_YLkNaoon6ckv8xLJ63f_zrMRmQsInKEPlMOt9Z8fKOObgdhsVv_hheAzivRIUeNQBNCEWWK1sTrr7TKNTKhFmvoyfU2k-pa777OcFN';
+      final response = await http.post(
+        'https://fcm.googleapis.com/fcm/send',
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'key=$serverToken',
+        },
+        body: jsonEncode(
+          <String, dynamic>{
+            'notification': <String, dynamic>{
+              'body': message,
+              'title':
+                  '${OTPAuth.currentUserProfile.displayName} (${OTPAuth.currentUser.phoneNumber})',
+            },
+            'priority': 'high',
+            'data': <String, dynamic>{
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'id': '1',
+              'status': 'done'
+            },
+            'to': token,
+          },
+        ),
+      );
+      print(response);
     } on Exception catch (ex) {
       print(ex);
     }
@@ -153,11 +156,13 @@ class ChatService {
 
   // only for user not admin
   static StreamSubscription<QuerySnapshot> unreadMessageStream() {
-    return FirestoreCollection.latestMessage(OTPAuth.currentUser.uid).listen((event) {
+    return FirestoreCollection.latestMessage(OTPAuth.currentUser.uid)
+        .listen((event) {
       if (event.documents.length == 1) {
         MessageInfo info = MessageInfo.fromMap(event.documents[0].data);
         ChatService.unreadStreamController.add(Map.fromEntries([
-          MapEntry(OTPAuth.currentUser.uid, info.sender != OTPAuth.currentUser.uid && !info.isRead)
+          MapEntry(OTPAuth.currentUser.uid,
+              info.sender != OTPAuth.currentUser.uid && !info.isRead)
         ]));
       }
     });

@@ -47,8 +47,8 @@ class _LatestMessageState extends State<LatestMessage> {
                       Text(
                         !noe(info.image)
                             ? 'Image'
-                            : info.message.length > 20
-                                ? info.message.substring(0, 20) + '...'
+                            : info.message.length > 30
+                                ? info.message.substring(0, 30) + '...'
                                 : info.message,
                         style: TextStyle(fontStyle: FontStyle.italic),
                       ),

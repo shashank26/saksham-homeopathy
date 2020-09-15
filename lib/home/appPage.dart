@@ -45,47 +45,43 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
         ProfilePage(),
       ];
     } else {
-      FirestoreCollection.isWhiteListed(OTPAuth.currentUser.phoneNumber)
-          .then((value) {
-        if (value.documents.length > 0) {
-          ChatService.getUserInfo(OTPAuth.adminId).listen((value) {
-            setState(() {
-              if (this.widgets.length == 0) {
-                this.widgets = <Widget>[
-                  AdminUpdates(),
-                  ChatPage(new ChatService(OTPAuth.adminId),
-                      ProfileInfo.fromMap(value.data), _isVisible.stream),
-                  HistoryView(user: widget.user, uid: widget.user.uid),
-                  ProfilePage(),
-                ];
-              } else {
-                this.widgets[1] = ChatPage(new ChatService(OTPAuth.adminId),
-                    ProfileInfo.fromMap(value.data), _isVisible.stream);
-              }
-            });
-          });
-        } else {
-          setState(() {
+      ChatService.getUserInfo(OTPAuth.adminId).listen((value) {
+        setState(() {
+          if (this.widgets.length == 0) {
             this.widgets = <Widget>[
               AdminUpdates(),
-              Container(
-                child: Center(
-                  child: Align(
-                    alignment: Alignment.center,
-                      child: Text(
-                    'Please subscribe or contact your doctor to access chat.',
-                    style: TextStyle(
-                      color: AppColorPallete.textColor,
-                      fontSize: 16,
-                    ),
-                  )),
-                ),
-              ),
+              Container(),
               HistoryView(user: widget.user, uid: widget.user.uid),
               ProfilePage(),
             ];
-          });
-        }
+          }
+        });
+
+        FirestoreCollection.isWhiteListed(OTPAuth.currentUser.phoneNumber)
+            .listen((doc) {
+          if (doc.documents.length > 0) {
+            setState(() {
+              this.widgets[1] = ChatPage(new ChatService(OTPAuth.adminId),
+                  ProfileInfo.fromMap(value.data), _isVisible.stream);
+            });
+          } else {
+            setState(() {
+              this.widgets[1] = Container(
+                child: Center(
+                  child: Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Please subscribe or contact your doctor to access chat.',
+                        style: TextStyle(
+                          color: AppColorPallete.textColor,
+                          fontSize: 16,
+                        ),
+                      )),
+                ),
+              );
+            });
+          }
+        });
       });
       _isVisible.add(false);
     }
