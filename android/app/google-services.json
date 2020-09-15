@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "370359903366-i3q3k1i95kpt0k29vooiojinaa0g2k3s.apps.googleusercontent.com",
+          "client_id": "370359903366-lcd89v6almdcf4pgu70pn94h2ls6cc9k.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.ibis.saksham_homeopathy",
-            "certificate_hash": "e36ac83461707512ad4c10a35f3041a210bc1db5"
+            "certificate_hash": "5d540470b05529cc208faafbe6bda98dccaa6f72"
           }
         },
         {
