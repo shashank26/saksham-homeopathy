@@ -9,11 +9,27 @@ class CImagePicker {
   static ImagePicker _picker = ImagePicker();
 
   static Future<PickedFile> _getRawImage(ImageSource source) async {
-        return await _picker.getImage(source: source, maxHeight: 500);
+    try {
+      return await _picker.getImage(source: source, maxHeight: 500);
+    } on Exception catch (e) {
+      return null;
+    }
+  }
+
+  static Future<PickedFile> _getRawVideo(ImageSource source) async {
+    try {
+      return await _picker.getVideo(source: source);
+    } on Exception catch (e) {
+      return null;
+    }
   }
 
   static Future<File> _getCroppedImage(String sourcePath) async {
-        return await ImageCropper.cropImage(sourcePath: sourcePath);
+    try {
+      return await ImageCropper.cropImage(sourcePath: sourcePath);
+    } on Exception catch (e) {
+      return null;
+    }
   }
 
   static Future<MessageImageInfo> getMessageImage(ImageSource source) async {
@@ -43,8 +59,7 @@ class CImagePicker {
 
   static Future<ProfileInfo> getProfilePhoto(
       ImageSource source, ProfileInfo info) async {
-    PickedFile rawImage =
-        await _getRawImage(source);
+    PickedFile rawImage = await _getRawImage(source);
 
     if (rawImage == null) return null;
 
@@ -63,11 +78,17 @@ class CImagePicker {
     if (rawImage == null) return null;
 
     File croppedImage = await _getCroppedImage(rawImage.path);
-    
+
     if (croppedImage == null) return null;
-    
+
     final File image =
         croppedImage == null ? File(rawImage.path) : croppedImage;
     return image;
+  }
+
+  static Future<File> getVideo(ImageSource source) async {
+    PickedFile rawVideo = await _getRawVideo(source);
+    if (rawVideo != null) return File(rawVideo.path);
+    return null;
   }
 }

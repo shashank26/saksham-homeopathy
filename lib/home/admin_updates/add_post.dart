@@ -1,11 +1,13 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:googleapis/youtube/v3.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
+import 'package:saksham_homeopathy/common/custom_dialog.dart';
 import 'package:saksham_homeopathy/common/image_source_bottom_sheet.dart';
-import 'package:saksham_homeopathy/common/network_or_file_image.dart';
+import 'package:saksham_homeopathy/home/admin_updates/file_view.dart';
 import 'package:saksham_homeopathy/models/admin_post.dart';
 import 'package:saksham_homeopathy/services/file_handler.dart';
 import 'package:saksham_homeopathy/services/image_picker.dart';
@@ -21,56 +23,143 @@ class AddPost extends StatefulWidget {
 
 class _AddPostState extends State<AddPost> {
   AdminPost _post;
-  bool _addLink = false;
   ImageSource _imageSource;
   final _postText = TextEditingController(text: '');
-  final _href = TextEditingController(text: '');
+  final _videoTitle = TextEditingController(text: '');
+  final isMP4Video = (File file) => file.path.endsWith('.mp4');
 
   @override
   initState() {
     super.initState();
+
     if (widget._post == null) {
       _post = AdminPost();
       return;
     }
     _post = AdminPost.fromMap(widget._post.data);
     _postText.text = _post.text;
-    if (!noe(_post.imageUrl)) {
-      FileHandler.instance
-          .getFile(_post.imageUrl, _post.imageName)
-          .then((value) {
-        setState(() {
-          _post.image = value;
+  }
+
+  _showDialog(String text) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return CustomDialog(text);
         });
-      });
+  }
+
+  _hideDialog() {
+    Navigator.pop(context);
+  }
+
+  _postUpdate({bool isTestimonial = false}) async {
+    try {
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text('Posting...'),
+        duration: Duration(seconds: 1),
+      ));
+      if (_post.file != null) {
+        if (isMP4Video(_post.file)) {
+          _showDialog('Compressing video...');
+          _post.file = await FileHandler.instance.compressMP4File(_post.file);
+          _hideDialog();
+        }
+        _showDialog('Uploading...');
+        _post = await FileHandler.instance.uploadPostFile(_post);
+        _hideDialog();
+      }
+      await _postUpdateAfterUpload(isTestimonial: isTestimonial);
+    } on DetailedApiRequestError catch (d) {
+      if (d.message.contains('quota'))
+        Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text('You have exceeded quota of 6 videos per day.')));
+      else
+        Scaffold.of(context)
+            .showSnackBar(SnackBar(content: Text('Post failed to upload.')));
+      _hideDialog();
+    } on Exception catch (e) {
+      Scaffold.of(context)
+          .showSnackBar(SnackBar(content: Text('Post failed to upload.')));
+      _hideDialog();
     }
   }
 
-  _postUpdate() async {
-    try {
-      Navigator.pop(context);
-      Scaffold.of(widget._parContext)
-          .showSnackBar(SnackBar(content: Text('Posting...')));
-      _post.text = _postText.text.trim();
-      _post.href = _href.text;
-      _post.timeStamp = DateTime.now();
-      if (_post.image != null) {
-        await FileHandler.instance.uploadPostImage(_post);
-      }
-      if (widget._post != null) {
-        widget._post.reference.updateData(AdminPost.toMap(_post));
+  _postUpdateAfterUpload({bool isTestimonial = false}) async {
+    _showDialog('Posting...');
+    _post.timeStamp = DateTime.now();
+    if (widget._post != null) {
+      widget._post.reference.updateData(AdminPost.toMap(_post));
+    } else {
+      if (isTestimonial) {
+        await FirestoreCollection.postTestimonial.add(AdminPost.toMap(_post));
       } else {
         await FirestoreCollection.postUpdate.add(AdminPost.toMap(_post));
       }
-      _post = new AdminPost();
-      _href.text = '';
-      _postText.text = '';
-      Scaffold.of(widget._parContext)
-          .showSnackBar(SnackBar(content: Text('Post Successful')));
-    } on Exception catch (e) {
-      Scaffold.of(widget._parContext)
-          .showSnackBar(SnackBar(content: Text('Post failed to upload.')));
     }
+    _hideDialog();
+    Navigator.pop(context);
+    Scaffold.of(widget._parContext)
+        .showSnackBar(SnackBar(content: Text('Post Successful')));
+  }
+
+  _pickMedia(MediaType mediaType) async {
+    await showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        barrierColor: Colors.black.withOpacity(0.5),
+        context: context,
+        builder: (builder) => ImageSourceBottomSheet((ImageSource imageSource) {
+              _imageSource = imageSource;
+            }));
+
+    if (_imageSource != null) {
+      File media;
+      switch (mediaType) {
+        case MediaType.IMAGE:
+          media = await CImagePicker.getImage(_imageSource);
+          break;
+        case MediaType.VIDEO:
+          media = await CImagePicker.getVideo(_imageSource);
+          if (media != null && !media.path.endsWith('.mp4')) {
+            media = await media.rename('${media.path}.mp4');
+          }
+          break;
+      }
+      if (media != null) {
+        setState(() {
+          _post.file = media;
+        });
+      }
+    }
+  }
+
+  isPostValid() {
+    final sb = (e) => Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(e),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red[600],
+        ));
+    if (noe(_post.text) && _post.file == null) {
+      sb('Please add a post or any media.');
+      return false;
+    }
+    if (_post.file != null && isMP4Video(_post.file) && noe(_post.fileName)) {
+      sb('Please add a title to the video.');
+      return false;
+    }
+    return true;
+  }
+
+  isTestimonialValid() {
+    final sb = (e) => Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(e),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red[600],
+        ));
+    if (noe(_post.text) || _post.file == null || noe(_post.fileName)) {
+      sb('Please add a post and a video with a title.');
+      return false;
+    }
+    return true;
   }
 
   @override
@@ -82,34 +171,52 @@ class _AddPostState extends State<AddPost> {
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              Wrap(
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.image,
-                      color: AppColorPallete.color,
+              if (widget._post == null)
+                Wrap(
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        Icons.photo_library,
+                        color: AppColorPallete.color,
+                      ),
+                      onPressed: () async {
+                        await _pickMedia(MediaType.IMAGE);
+                      },
                     ),
-                    onPressed: () async {
-                      await showModalBottomSheet(
-                        backgroundColor: Colors.transparent,
-                        barrierColor: Colors.black.withOpacity(0.5),
-                          context: context,
-                          builder: (builder) =>
-                              ImageSourceBottomSheet((ImageSource imageSource) {
-                                _imageSource = imageSource;
-                              }));
-                      if (_imageSource != null) {
-                        final File image =
-                            await CImagePicker.getImage(_imageSource);
-                        setState(() {
-                          _post.image = image;
-                          _post.imageName = ImagePath.imagePostPath();
-                        });
+                    IconButton(
+                      icon: Icon(
+                        Icons.videocam,
+                        color: AppColorPallete.color,
+                      ),
+                      onPressed: () async {
+                        await _pickMedia(MediaType.VIDEO);
+                      },
+                    ),
+                  ],
+                ),
+              if (widget._post == null)
+                Visibility(
+                  visible: _post.file != null,
+                  child: FileView(_post.file, () async {
+                    if (widget._post != null) {
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text('Deleting file from cloud.'),
+                      ));
+                      await FileHandler.instance
+                          .deleteCloudFile(_post.fileName);
+                      if (_post.fileName.endsWith('.mp4')) {
+                        await FileHandler.instance
+                            .deleteCloudFile(_post.fileName + '.png');
                       }
-                    },
-                  ),
-                ],
-              ),
+                    }
+                    setState(() {
+                      _post.file = null;
+                      _post.fileName = null;
+                      _post.fileUrl = null;
+                      _post.videoThumbnail = null;
+                    });
+                  }),
+                ),
               TextField(
                 controller: _postText,
                 decoration: InputDecoration(
@@ -119,93 +226,78 @@ class _AddPostState extends State<AddPost> {
                 ),
                 maxLines: null,
                 minLines: 2,
-                maxLength: 200,
-              ),
-              Visibility(
-                visible: _addLink,
-                child: TextField(
-                  controller: _href,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.link),
-                    labelText: 'Add a link',
-                    floatingLabelBehavior: FloatingLabelBehavior.never,
-                  ),
-                  maxLines: null,
-                  minLines: 2,
-                  maxLength: 300,
-                ),
-              ),
-              if (_post.image != null)
-                Material(
-                  elevation: 10,
-                  child: Stack(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(18.0),
-                        child: NetworkOrFileImage(
-                          null,
-                          null,
-                          _post.image.path,
-                          raw: true,
-                          height: 200,
-                          width: 200,
-                        ),
-                      ),
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: Container(
-                          height: 40,
-                          width: 40,
-                          child: Material(
-                            elevation: 5,
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.black.withOpacity(0.5),
-                            child: Center(
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.close,
-                                  // size: 25,
-                                  color: Colors.redAccent,
-                                ),
-                                onPressed: () {
-                                  FileHandler.instance.deleteRaw(_post.image);
-                                  setState(() {
-                                    _post.image = null;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              FlatButton(
-                color: AppColorPallete.color,
-                onPressed: () async {
-                  if (noe(_post.imageName) &&
-                      noe(_postText.text) &&
-                      noe(_href.text)) {
-                    Scaffold.of(context).showSnackBar(SnackBar(
-                      content: Text("Please add an image, link or post"),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.red[600],
-                    ));
-                    return;
-                  }
-                  await _postUpdate();
+                onChanged: (val) {
+                  _post.text = val;
                 },
-                child: Text(
-                  widget._post == null ? 'Post' : 'Update',
-                  style: TextStyle(color: Colors.white),
+              ),
+              if (widget._post == null)
+                Visibility(
+                  visible: _post.file != null && isMP4Video(_post.file),
+                  child: TextField(
+                    // controller: _videoTitle,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.text_fields),
+                      labelText: 'Give a title for video...',
+                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                    ),
+                    maxLines: null,
+                    minLines: 2,
+                    onChanged: (val) {
+                      _post.fileName = val;
+                    },
+                  ),
                 ),
+              Wrap(
+                spacing: 10,
+                children: [
+                  FlatButton(
+                    color: AppColorPallete.color,
+                    onPressed: () async {
+                      if (isPostValid()) {
+                        await _postUpdate();
+                      }
+                    },
+                    child: Text(
+                      widget._post == null ? 'Post' : 'Update',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  if (widget._post == null)
+                    FlatButton(
+                      color: AppColorPallete.color,
+                      onPressed: () async {
+                        if (isTestimonialValid()) {
+                          await _postUpdate(isTestimonial: true);
+                        }
+                      },
+                      child: Text(
+                        'Testimonial',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+class UploadStateTemp with ChangeNotifier, DiagnosticableTreeMixin {
+  double _uploaded;
+  double get uploaded => _uploaded;
+
+  void setStatus(double val) {
+    _uploaded = val;
+    notifyListeners();
+  }
+
+  /// Makes `Counter` readable inside the devtools by listing all of its properties
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DoubleProperty('uploaded', uploaded));
   }
 }

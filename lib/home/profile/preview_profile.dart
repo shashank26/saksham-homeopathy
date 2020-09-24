@@ -39,8 +39,10 @@ class PreviewProfile extends StatelessWidget {
                               builder: (context) {
                                 return Scaffold(
                                   appBar: AppBar(
-                                    backgroundColor: AppColorPallete.backgroundColor,
-                                    iconTheme: IconThemeData(color: AppColorPallete.textColor),
+                                    backgroundColor:
+                                        AppColorPallete.backgroundColor,
+                                    iconTheme: IconThemeData(
+                                        color: AppColorPallete.textColor),
                                   ),
                                   body: Container(
                                     child: PhotoView(
@@ -92,16 +94,17 @@ class PreviewProfile extends StatelessWidget {
                               fontWeight: FontWeight.w900,
                               decoration: TextDecoration.underline),
                         )),
-                        Container(
-                            child: Text(
-                          _profileInfo.dateOfBirth != null
-                              ? ProfileInfo.formatter.format(
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                      _profileInfo.dateOfBirth))
-                              : 'Date of birth not updated!',
-                          style: TextStyle(
-                              color: AppColorPallete.textColor, fontSize: 18),
-                        )),
+                        if (this._profileInfo.isAdmin != null && !this._profileInfo.isAdmin)
+                          Container(
+                              child: Text(
+                            _profileInfo.dateOfBirth != null
+                                ? ProfileInfo.formatter.format(
+                                    DateTime.fromMillisecondsSinceEpoch(
+                                        _profileInfo.dateOfBirth))
+                                : 'Date of birth not updated!',
+                            style: TextStyle(
+                                color: AppColorPallete.textColor, fontSize: 18),
+                          )),
                         Container(
                             child: Text(
                           _profileInfo.phoneNumber,

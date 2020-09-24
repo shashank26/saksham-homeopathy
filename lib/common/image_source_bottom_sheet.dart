@@ -52,7 +52,7 @@ class ImageSourceBottomSheet extends StatelessWidget {
                     Icon(Icons.photo),
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),
-                      child: Text('Images'),
+                      child: Text('Media'),
                     ),
                   ],
                 ),

@@ -20,7 +20,8 @@ class ImagePath {
       (String uid) => 'photoUrl/$uid/${Uuid().v1()}.png';
   static final imageMessagePath =
       (String uid) => 'messages/$uid/${Uuid().v1()}.png';
-  static final imagePostPath = () => 'adminPosts/${Uuid().v1()}.png';
+  static final imagePostPath = () =>
+      'adminPosts/${Uuid().v1()}.png';
 }
 
 class FirestoreCollection {
@@ -46,9 +47,10 @@ class FirestoreCollection {
       .first;
   static final adminUpdates = (int size) => Firestore.instance
       .collection('adminUpdates')
-      .limit(size)
-      .orderBy('timeStamp', descending: true);
+      .orderBy('timeStamp', descending: true)
+      .limit(size);
   static final postUpdate = Firestore.instance.collection('adminUpdates');
+  static final postTestimonial = Firestore.instance.collection('testimonials');
   static final profileStream =
       (uid) => FirestoreCollection.userInfo(uid).snapshots();
   static final isWhiteListed = (phoneNumber) => Firestore.instance
@@ -57,6 +59,28 @@ class FirestoreCollection {
       .snapshots();
   static final updateRequired =
       () => Firestore.instance.collection('update').snapshots();
+  static final getActiveUsers =
+      () => Firestore.instance.collection('users').getDocuments();
+  static final whiteList = () => Firestore.instance.collection('whitelist');
+  static final testimonials = (int size) => Firestore.instance
+      .collection('testimonials')
+      .orderBy('timeStamp', descending: true)
+      .limit(size);
+}
+
+class YoutubeApiConstants {
+  static final thumbnail = (String id) => 'https://img.youtube.com/vi/$id/sddefault.jpg';
+  static final embedUrl = (String id) => 'https://www.youtube.com/embed/$id?autoplay=1&mute=1';
+}
+
+class FirebaseConstants {
+  static const bool _DEBUG = true;
+  static const String STORAGE_BUCKET = _DEBUG
+      ? 'gs://flutter-learn-3fcb5.appspot.com'
+      : 'gs://saksham-homeopathy.appspot.com';
+  static const String MESSAGING_TOKEN = _DEBUG
+      ? 'AAAAIXZAUp8:APA91bHyOoGRZxlFOigzTbS828tmbgSQCH7bBnQo9Mjz2L1F8xxgMqaLcO7qhKUjjCfrxJabxsxZ8aMPx-b4V60AbF7vlm9HRQ-fRlFW6XWw0mW1Ro8mwoDAVBubNlFC1tSBsRlytRJF'
+      : 'AAAAVjsrpIY:APA91bG_k_WlY3uAmmKln8wX3SyrU-f-Rz4sh_YLkNaoon6ckv8xLJ63f_zrMRmQsInKEPlMOt9Z8fKOObgdhsVv_hheAzivRIUeNQBNCEWWK1sTrr7TKNTKhFmvoyfU2k-pa777OcFN';
 }
 
 enum LoginState {
@@ -71,6 +95,13 @@ enum LoginState {
 enum UpdateType { Recommended, Required }
 
 enum PhotoUploadState { started, inProgress, complete }
+
+enum PopupMenuValues {
+  DELETE,
+  EDIT,
+}
+
+enum MediaType { IMAGE, VIDEO }
 
 enum DialogType { alert, progress }
 

@@ -32,19 +32,18 @@ class _NetworkOrFileImageState extends State<NetworkOrFileImage> {
   @override
   void initState() {
     super.initState();
-    _loadBlurImage = !FileHandler.instance.exists(fileName : widget._fileName);
+    _loadBlurImage = !FileHandler.instance.exists(fileName: widget._fileName);
   }
 
   @override
   Widget build(BuildContext context) {
     if (widget.raw) {
       return Image.file(
-                FileHandler.instance
-              .getRawFile(fullName : widget._fileName),
-                fit: BoxFit.cover,
-                height: widget.height,
-                width: widget.width,
-              );
+        FileHandler.instance.getRawFile(fullName: widget._fileName),
+        fit: BoxFit.cover,
+        height: widget.height,
+        width: widget.width,
+      );
     }
 
     if (widget._blurredUrl != null &&
@@ -73,13 +72,24 @@ class _NetworkOrFileImageState extends State<NetworkOrFileImage> {
                 width: widget.width,
               );
             }
-            return Container(
-              height: 30,
-              width: 30,
-              child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColorPallete.color),
-            ));
+            return Center(
+              child: Container(
+                  height: 30,
+                  width: 30,
+                  child: CircularProgressIndicator(
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppColorPallete.color),
+                  )),
+            );
           });
+    } else if (!noe(widget._url)) {
+      return FadeInImage.assetNetwork(
+        image: widget._url,
+        placeholder: 'images/saksham_homeopathy.jpeg',
+        fit: BoxFit.cover,
+        height: widget.height,
+        width: widget.width,
+      );
     } else {
       return Container();
     }

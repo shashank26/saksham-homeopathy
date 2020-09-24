@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:saksham_homeopathy/common/CTextFormField.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
-import 'package:saksham_homeopathy/common/custom_dialog.dart';
 import 'package:saksham_homeopathy/common/date_dialog.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/common/image_source_bottom_sheet.dart';
@@ -12,6 +11,7 @@ import 'package:saksham_homeopathy/common/network_or_file_image.dart';
 import 'package:saksham_homeopathy/introduction/connecting.dart';
 import 'package:saksham_homeopathy/models/profile_info.dart';
 import 'package:saksham_homeopathy/services/chat_service.dart';
+import 'package:saksham_homeopathy/services/google_auth.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
 import 'package:saksham_homeopathy/services/push_notification.dart';
 
@@ -299,6 +299,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                         _showSnackBar('Logging out...');
                                         await PushNotification.firebaseMessaging
                                             .deleteInstanceID();
+                                        if (OTPAuth.isAdmin) {
+                                          await GoogleAuth.instance.signOut();
+                                        }
                                         await widget._auth.signOut();
                                       },
                                       child: Text('Logout'),

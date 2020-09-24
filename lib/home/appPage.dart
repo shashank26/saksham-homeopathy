@@ -3,13 +3,16 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
+import 'package:saksham_homeopathy/common/custom_dialog.dart';
 import 'package:saksham_homeopathy/home/chat/admin_chat_page.dart';
 import 'package:saksham_homeopathy/home/admin_updates/admin_updates.dart';
 import 'package:saksham_homeopathy/home/chat/chat_page.dart';
 import 'package:saksham_homeopathy/home/history/historyPage.dart';
 import 'package:saksham_homeopathy/home/profile/profilePage.dart';
+import 'package:saksham_homeopathy/introduction/connecting.dart';
 import 'package:saksham_homeopathy/models/profile_info.dart';
 import 'package:saksham_homeopathy/services/chat_service.dart';
+import 'package:saksham_homeopathy/services/google_auth.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
 
 class AppPage extends StatefulWidget {
@@ -25,11 +28,26 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
   Animation<double> animation;
   List<Widget> widgets = [];
   StreamController<bool> _isVisible = StreamController.broadcast();
-  // List<int> _traversedIndexes = [];
+  bool _googleAuthComplete = !OTPAuth.isAdmin;
 
   @override
   void initState() {
     super.initState();
+    _initialize();
+    if (OTPAuth.isAdmin) _handleGoogleAuth();
+  }
+
+  _handleGoogleAuth() async {
+    final instance = GoogleAuth.instantiate();
+    instance.onCurrentUserChanged.listen((event) {
+      setState(() {
+        _googleAuthComplete = true;
+      });
+    });
+    instance.signIn();
+  }
+
+  _initialize() {
     if (ChatService.unreadStreamController == null ||
         ChatService.unreadStreamController.isClosed) {
       ChatService.unreadStreamController = StreamController.broadcast();
@@ -108,6 +126,9 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    if (!_googleAuthComplete) {
+      return Container(child: CustomDialog('Loggin in via google...'));
+    }
     return Scaffold(
       body: FadeTransition(
         opacity: animation,

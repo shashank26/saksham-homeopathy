@@ -120,8 +120,8 @@ class _HistoryViewState extends State<HistoryView> {
                             setState(() {
                               medicineSearchResult = medicineInfoList
                                   .where((element) => element.data['name']
-                                      .toString()
-                                      .startsWith(val))
+                                      .toString().toLowerCase()
+                                      .startsWith(val.toLowerCase()))
                                   .toList();
                             });
                           }

@@ -19,6 +19,7 @@ class _LandingPageState extends State<LandingPage> {
   bool _initializationFlag = false;
   bool _recommendedUpdateFlag = false;
   bool _requiredUpdateFlag = false;
+  bool _isNewLogin = false;
 
   @override
   void initState() {
@@ -74,9 +75,10 @@ class _LandingPageState extends State<LandingPage> {
             }
             FirebaseUser user = snapshot.data;
             if (user == null) {
+              _isNewLogin = true;
               return Index();
             }
-            return Initialize();
+            return Initialize(_isNewLogin);
           });
     }
     if (_requiredUpdateFlag || _recommendedUpdateFlag) {
@@ -97,7 +99,8 @@ class _LandingPageState extends State<LandingPage> {
                 color: AppColorPallete.color,
                 elevation: 5,
                 onPressed: () {
-                  launch('http://play.google.com/store/apps/details?id=com.ibis.saksham_homeopathy');
+                  launch(
+                      'http://play.google.com/store/apps/details?id=com.ibis.saksham_homeopathy');
                 },
                 child: Text(
                   'Update',

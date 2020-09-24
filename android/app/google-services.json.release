@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "370359903366",
+    "firebase_url": "https://saksham-homeopathy.firebaseio.com",
+    "project_id": "saksham-homeopathy",
+    "storage_bucket": "saksham-homeopathy.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:370359903366:android:0c7c66e015cc445fb91d07",
+        "android_client_info": {
+          "package_name": "com.ibis.saksham_homeopathy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "370359903366-o7i3kukh1ct2jnt2vd861pu0lqvj5556.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ibis.saksham_homeopathy",
+            "certificate_hash": "c0ff8c42802a9f1c7e6a1a827ea2365638a95053"
+          }
+        },
+        {
+          "client_id": "370359903366-95idlir55qgglagovnq644khs1irnvf8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXvSKYjmBc-OSJJqnzP0JXHEKAURwq7-0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "370359903366-95idlir55qgglagovnq644khs1irnvf8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

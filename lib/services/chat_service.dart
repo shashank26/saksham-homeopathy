@@ -59,8 +59,7 @@ class ChatService {
   sendNotification(String message, String token,
       {bool isEmergency = false}) async {
     try {
-      final serverToken =
-          'AAAAVjsrpIY:APA91bG_k_WlY3uAmmKln8wX3SyrU-f-Rz4sh_YLkNaoon6ckv8xLJ63f_zrMRmQsInKEPlMOt9Z8fKOObgdhsVv_hheAzivRIUeNQBNCEWWK1sTrr7TKNTKhFmvoyfU2k-pa777OcFN';
+      final serverToken = FirebaseConstants.MESSAGING_TOKEN;
       final response = await http.post(
         'https://fcm.googleapis.com/fcm/send',
         headers: <String, String>{
