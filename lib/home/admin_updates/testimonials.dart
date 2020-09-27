@@ -122,11 +122,6 @@ class _TestimonialsState extends State<Testimonials> {
                 onPressed: () async {
                   showDialog(
                       context: context, child: CustomDialog('Deleting...'));
-                  if (!noe(_post.fileName)) {
-                    await FileHandler.instance
-                        .deleteCloudFile(_post.fileName + '.png');
-                    await FileHandler.instance.deleteCloudFile(_post.fileName);
-                  }
                   await ref.delete();
                   int count = 0;
                   Navigator.popUntil(context, (route) {

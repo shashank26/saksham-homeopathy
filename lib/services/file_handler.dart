@@ -1,15 +1,13 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+// import 'package:flutter_video_compress/flutter_video_compress.dart' as vc;
 import 'package:googleapis/youtube/v3.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/models/admin_post.dart';
 import 'package:saksham_homeopathy/models/message_image_info.dart';
 import 'package:saksham_homeopathy/models/profile_info.dart';
-import 'package:video_compress/video_compress.dart';
-
 import 'google_auth.dart';
 
 class FileHandler {
@@ -18,6 +16,7 @@ class FileHandler {
   String applicationDirectoryPath;
   DefaultCacheManager _cacheManager;
   static FileHandler instance;
+  // final _flutterVideoCompress = vc.FlutterVideoCompress();
 
   static Future instantiate() async {
     if (instance == null) {
@@ -139,18 +138,24 @@ class FileHandler {
     return img.existsSync();
   }
 
-  Future<File> compressMP4File(File file) async {
-    try {
-      MediaInfo mediaInfo = await VideoCompress.compressVideo(
-        file.path,
-        quality: VideoQuality.MediumQuality,
-        deleteOrigin: false,
-      );
-      return mediaInfo.file;
-    } on Exception catch (e) {
-      return file;
-    }
-  }
+  // vc.Subscription _compressionSubscription;
+  // Future<File> compressMP4File(File file, {Function status}) async {
+  //   try {
+  //     if (_compressionSubscription == null)
+  //       _compressionSubscription =
+  //           _flutterVideoCompress.compressProgress$.subscribe((progress) {
+  //         if (status != null) status(progress);
+  //       });
+  //     vc.MediaInfo mediaInfo = await _flutterVideoCompress.compressVideo(
+  //       file.path,
+  //       quality: vc.VideoQuality.MediumQuality,
+  //       deleteOrigin: false,
+  //     );
+  //     return mediaInfo.file;
+  //   } on Exception catch (e) {
+  //     return file;
+  //   }
+  // }
 
   Future<AdminPost> uploadToYoutube(AdminPost post) async {
     final client = await GoogleAuth.instance.getClient();
@@ -168,6 +173,9 @@ class FileHandler {
     video.status = status;
 
     Media m = Media(post.file.openRead(), post.file.lengthSync());
+    post.file.openRead().listen((event) {
+      print(event);
+    });
     Video vid = await yt.videos.insert(video, 'snippet,status', uploadMedia: m);
     post.fileUrl = vid.id;
     post.videoThumbnail = vid.id;

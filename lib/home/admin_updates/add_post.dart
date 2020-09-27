@@ -27,6 +27,8 @@ class _AddPostState extends State<AddPost> {
   final _postText = TextEditingController(text: '');
   final _videoTitle = TextEditingController(text: '');
   final isMP4Video = (File file) => file.path.endsWith('.mp4');
+  // bool _showDialog = false;
+  // String _progressionText = '';
 
   @override
   initState() {
@@ -59,11 +61,11 @@ class _AddPostState extends State<AddPost> {
         duration: Duration(seconds: 1),
       ));
       if (_post.file != null) {
-        if (isMP4Video(_post.file)) {
-          _showDialog('Compressing video...');
-          _post.file = await FileHandler.instance.compressMP4File(_post.file);
-          _hideDialog();
-        }
+        // if (isMP4Video(_post.file)) {
+        //   _showDialog('Compressing video...');
+        //   _post.file = await FileHandler.instance.compressMP4File(_post.file);
+        //   _hideDialog();
+        // }
         _showDialog('Uploading...');
         _post = await FileHandler.instance.uploadPostFile(_post);
         _hideDialog();
@@ -166,7 +168,6 @@ class _AddPostState extends State<AddPost> {
   Widget build(BuildContext context) {
     return Material(
       child: Container(
-        padding: EdgeInsets.all(5),
         height: MediaQuery.of(context).size.height,
         child: SingleChildScrollView(
           child: Column(
@@ -289,8 +290,16 @@ class UploadStateTemp with ChangeNotifier, DiagnosticableTreeMixin {
   double _uploaded;
   double get uploaded => _uploaded;
 
-  void setStatus(double val) {
+  void setUploadedStatus(double val) {
     _uploaded = val;
+    notifyListeners();
+  }
+
+  double _compressed;
+  double get compressed => _compressed;
+
+  void setCompressedStatus(double val) {
+    _compressed = val;
     notifyListeners();
   }
 

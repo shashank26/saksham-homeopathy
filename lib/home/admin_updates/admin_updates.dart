@@ -180,62 +180,61 @@ class _AdminUpdatesState extends State<AdminUpdates> {
   }
 
   _getVideoPreview(AdminPost _post) {
-    return Container(
-      height: 300,
-      width: MediaQuery.of(context).size.width,
-      child: Stack(
-        children: [
-          NetworkOrFileImage(
-            YoutubeApiConstants.thumbnail(_post.videoThumbnail),
-            null,
-            null,
-            width: MediaQuery.of(context).size.width,
-            height: 300,
-          ),
-          Container(
-              height: double.maxFinite,
-              width: double.maxFinite,
-              color: Colors.black.withOpacity(0.3),
-              child: IconButton(
-                icon: Icon(
-                  Icons.play_arrow,
-                  color: Colors.white,
-                ),
-                onPressed: () async {
-                  final androidInfo = await DeviceInfoPlugin().androidInfo;
-                  final sdkInt = androidInfo.version.sdkInt;
-                  if (sdkInt < 20) {
-                    await launch(YoutubeApiConstants.embedUrl(_post.fileUrl));
-                    return;
-                  }
-                  Navigator.of(context).push(PageRouteBuilder(
-                      opaque: false,
-                      pageBuilder: (BuildContext context, _, __) {
-                        YoutubePlayerController _controller =
-                            YoutubePlayerController(
-                          initialVideoId: _post.fileUrl,
-                          flags: YoutubePlayerFlags(
-                            autoPlay: true,
-                            mute: false,
-                          ),
-                        );
-                        return YoutubePlayer(
-                          controller: _controller,
-                          showVideoProgressIndicator: false,
-                          progressIndicatorColor: AppColorPallete.color,
-                          onReady: () {
-                            _controller.addListener(() {});
-                          },
-                        );
-                      }));
-                },
-              )),
-        ],
-      ),
+    return Stack(
+      children: [
+        NetworkOrFileImage(
+          YoutubeApiConstants.thumbnail(_post.videoThumbnail),
+          null,
+          null,
+          width: MediaQuery.of(context).size.width,
+          height: 300,
+        ),
+        Container(
+            height: double.maxFinite,
+            width: double.maxFinite,
+            color: Colors.black.withOpacity(0.3),
+            child: IconButton(
+              icon: Icon(
+                Icons.play_arrow,
+                color: Colors.white,
+              ),
+              onPressed: () async {
+                final androidInfo = await DeviceInfoPlugin().androidInfo;
+                final sdkInt = androidInfo.version.sdkInt;
+                if (sdkInt < 20) {
+                  await launch(YoutubeApiConstants.embedUrl(_post.fileUrl));
+                  return;
+                }
+                Navigator.of(context).push(PageRouteBuilder(
+                    opaque: false,
+                    pageBuilder: (BuildContext context, _, __) {
+                      YoutubePlayerController _controller =
+                          YoutubePlayerController(
+                        initialVideoId: _post.fileUrl,
+                        flags: YoutubePlayerFlags(
+                          autoPlay: true,
+                          mute: false,
+                        ),
+                      );
+                      return YoutubePlayer(
+                        controller: _controller,
+                        showVideoProgressIndicator: false,
+                        progressIndicatorColor: AppColorPallete.color,
+                        onReady: () {
+                          _controller.addListener(() {});
+                        },
+                      );
+                    }));
+              },
+            )),
+      ],
     );
   }
 
   _expandableText(String text) {
+    if (noe(text)) {
+      return Container();
+    }
     String firstHalf = text.length > 300 ? text.substring(0, 300) : text;
     return Wrap(
       children: [
@@ -358,8 +357,9 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                                 ),
                                 Visibility(
                                   visible: !noe(_post.fileName),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(0),
+                                  child: Container(
+                                    height: 300,
+                                    width: MediaQuery.of(context).size.width,
                                     child: noe(_post.fileName)
                                         ? Container()
                                         : !noe(_post.videoThumbnail)
