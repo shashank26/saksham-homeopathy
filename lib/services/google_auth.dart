@@ -35,9 +35,13 @@ class GoogleAuth {
   }
 
   signIn() async {
-    GoogleSignInAccount signIn = await _googleSignIn.signInSilently();
-    if (signIn == null) {
-      await _googleSignIn.signIn();
+    try {
+      GoogleSignInAccount signIn = await _googleSignIn.signInSilently();
+      if (signIn == null) {
+        await _googleSignIn.signIn();
+      }
+    } on Exception catch (e) {
+      print(e);
     }
   }
 

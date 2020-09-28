@@ -8,7 +8,7 @@ class AdminPost {
   String fileUrl;
   File file;
   String videoThumbnail;
-  String text;  
+  String text = "";  
   DateTime _timeStamp;
 
   AdminPost(

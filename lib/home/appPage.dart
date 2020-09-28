@@ -28,7 +28,6 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
   Animation<double> animation;
   List<Widget> widgets = [];
   StreamController<bool> _isVisible = StreamController.broadcast();
-  bool _googleAuthComplete = !OTPAuth.isAdmin;
 
   @override
   void initState() {
@@ -39,11 +38,6 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
 
   _handleGoogleAuth() async {
     final instance = GoogleAuth.instantiate();
-    instance.onCurrentUserChanged.listen((event) {
-      setState(() {
-        _googleAuthComplete = true;
-      });
-    });
     instance.signIn();
   }
 
@@ -126,9 +120,7 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    if (!_googleAuthComplete) {
-      return Container(child: CustomDialog('Loggin in via google...'));
-    }
+
     return Scaffold(
       body: FadeTransition(
         opacity: animation,
