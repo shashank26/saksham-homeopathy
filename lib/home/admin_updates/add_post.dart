@@ -6,6 +6,7 @@ import 'package:googleapis/youtube/v3.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/custom_dialog.dart';
+import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/common/image_source_bottom_sheet.dart';
 import 'package:saksham_homeopathy/home/admin_updates/file_view.dart';
 import 'package:saksham_homeopathy/models/admin_post.dart';
@@ -27,6 +28,7 @@ class _AddPostState extends State<AddPost> {
   final _postText = TextEditingController(text: '');
   final _videoTitle = TextEditingController(text: '');
   final isMP4Video = (File file) => file.path.endsWith('.mp4');
+  MediaType selectedMediaType;
   // bool _showDialog = false;
   // String _progressionText = '';
 
@@ -67,7 +69,8 @@ class _AddPostState extends State<AddPost> {
         //   _hideDialog();
         // }
         _showDialog('Uploading...');
-        _post = await FileHandler.instance.uploadPostFile(_post);
+        _post =
+            await FileHandler.instance.uploadPostFile(_post, selectedMediaType);
         _hideDialog();
       }
       await _postUpdateAfterUpload(isTestimonial: isTestimonial);
@@ -134,6 +137,65 @@ class _AddPostState extends State<AddPost> {
     }
   }
 
+  Future<String> _getMediaLink() async {
+    final link = await showDialog<String>(
+        context: context,
+        builder: (context) {
+          String link = '';
+          return Material(
+            child: Container(
+              padding: EdgeInsets.all(40),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  HeaderText(
+                    'Paste a youtube link here!',
+                    size: 16,
+                  ),
+                  TextField(
+                    onChanged: (val) {
+                      link = val;
+                    },
+                  ),
+                  Wrap(
+                    spacing: 10,
+                    children: [
+                      FlatButton(
+                          color: AppColorPallete.color,
+                          onPressed: () {
+                            Navigator.pop(context, link);
+                          },
+                          child: Text(
+                            'Ok',
+                            style: TextStyle(color: Colors.white),
+                          )),
+                      FlatButton(
+                          color: AppColorPallete.color,
+                          onPressed: () {
+                            Navigator.pop(context, null);
+                          },
+                          child: Text(
+                            'Cancel',
+                          ))
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+    try {
+      final filters = ['//www.youtube.com/watch?v=', '//youtu.be/'];
+      if (!noe(link) && filters.any((f) => link.contains(f))) {
+        final filter = filters.where((f) => link.contains(f)).first;
+        return link.split(filter)[1].substring(0, 11);
+      }
+    } on Exception catch (e) {
+      Scaffold.of(context)
+          .showSnackBar(SnackBar(content: Text('Url is not valid!')));
+    }
+  }
+
   isPostValid() {
     final sb = (e) => Scaffold.of(context).showSnackBar(SnackBar(
           content: Text(e),
@@ -182,6 +244,7 @@ class _AddPostState extends State<AddPost> {
                       ),
                       onPressed: () async {
                         await _pickMedia(MediaType.IMAGE);
+                        selectedMediaType = MediaType.IMAGE;
                       },
                     ),
                     IconButton(
@@ -191,6 +254,28 @@ class _AddPostState extends State<AddPost> {
                       ),
                       onPressed: () async {
                         await _pickMedia(MediaType.VIDEO);
+                        selectedMediaType = MediaType.VIDEO;
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.link,
+                        color: AppColorPallete.color,
+                      ),
+                      onPressed: () async {
+                        final link = await _getMediaLink();
+                        if (!noe(link)) {
+                          File thumbnail = await FileHandler.instance.getFile(
+                              YoutubeApiConstants.thumbnail(link),
+                              'thumbnail.png');
+                          selectedMediaType = MediaType.LINK;
+                          setState(() {
+                            _post.file = thumbnail;
+                            _post.fileName = link;
+                            _post.fileUrl = link;
+                            _post.videoThumbnail = link;
+                          });
+                        }
                       },
                     ),
                   ],

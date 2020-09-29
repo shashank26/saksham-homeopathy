@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/custom_dialog.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/models/medicine_info.dart';
@@ -98,6 +99,19 @@ class HistoryTile extends StatelessWidget {
                         ),
                         Text(
                           mInfo.getDatePrescribed(),
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic, fontSize: 16),
+                        ),
+                        Spacer(
+                          flex: 1,
+                        ),
+                        if (!noe(mInfo.getEndDate()))
+                          Text(
+                            'End Date: ',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        Text(
+                          mInfo.getEndDate(),
                           style: TextStyle(
                               fontStyle: FontStyle.italic, fontSize: 16),
                         )

@@ -34,7 +34,7 @@ class _UserChatTileState extends State<UserChatTile> {
   showDialog(
       context: context,
       builder: (BuildContext bc) {
-        return ChatPage(ChatService(widget.uid),  _profileInfo, null);
+        return ChatPage(ChatService(widget.uid),  _profileInfo, null, whitelisted : true);
       });
   }
 

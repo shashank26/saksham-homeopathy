@@ -11,6 +11,7 @@ class AddMedicineForm extends StatelessWidget {
   final _dateController = new TextEditingController(text: '');
   final _nameController = new TextEditingController(text: '');
   final _dosageController = new TextEditingController(text: '');
+  final _endDateController = new TextEditingController(text: '');
   final MedicineInfo _medicineInfo = MedicineInfo();
   final FirebaseUser user;
 
@@ -58,8 +59,37 @@ class AddMedicineForm extends StatelessWidget {
                       firstDate: DateTime.now().subtract(Duration(days: 365)),
                       lastDate: DateTime.now().add(Duration(days: 365)));
                   if (dateSelected != null) {
-                    this._medicineInfo.datePrescribed = dateSelected.millisecondsSinceEpoch;
-                    _dateController.text = this._medicineInfo.getDatePrescribed();
+                    this._medicineInfo.datePrescribed =
+                        dateSelected.millisecondsSinceEpoch;
+                    _dateController.text =
+                        this._medicineInfo.getDatePrescribed();
+                  }
+                },
+              ),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 10),
+            child: CTextFormField(
+              controller: _endDateController,
+              labelText: 'End Date',
+              onSaved: (val) => {},
+              validator: (val) => null,
+              onChanged: (val) {
+                this._medicineInfo.setEndDate(val);
+              },
+              suffixIcon: IconButton(
+                icon: Icon(Icons.date_range),
+                onPressed: () async {
+                  final DateTime dateSelected = await showDateDialog(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime.now().subtract(Duration(days: 365)),
+                      lastDate: DateTime.now().add(Duration(days: 365)));
+                  if (dateSelected != null) {
+                    this._medicineInfo.endDate =
+                        dateSelected.millisecondsSinceEpoch;
+                    _endDateController.text = this._medicineInfo.getEndDate();
                   }
                 },
               ),
@@ -71,20 +101,29 @@ class AddMedicineForm extends StatelessWidget {
               child: Text('Add'),
               onPressed: () async {
                 _formKey.currentState.save();
-                Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text('Adding medicine to the list.'),
-                ));
-                _medicineInfo.uid = user.uid;
-                await FirestoreCollection.addMedicine(OTPAuth.currentUser.uid)
-                    .add(MedicineInfo.toMap(_medicineInfo));
-                Scaffold.of(context).hideCurrentSnackBar();
-                _nameController.text = '';
-                _dateController.text = '';
-                _dosageController.text = '';
-                Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text('Added.'),
-                ));
-                // Navigator.pop(context);
+                if (this._medicineInfo.isEndDateValid() &&
+                    !noe(this._medicineInfo.name) &&
+                    !noe(this._medicineInfo.dosage) &&
+                    !noe(this._medicineInfo.getDatePrescribed())) {
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                    content: Text('Adding medicine to the list.'),
+                  ));
+                  _medicineInfo.uid = user.uid;
+                  await FirestoreCollection.addMedicine(OTPAuth.currentUser.uid)
+                      .add(MedicineInfo.toMap(_medicineInfo));
+                  Scaffold.of(context).hideCurrentSnackBar();
+                  _nameController.text = '';
+                  _dateController.text = '';
+                  _dosageController.text = '';
+                  _endDateController.text = '';
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                    content: Text('Added.'),
+                  ));
+                } else {
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                    content: Text('Please fill all necessary details [Name, Dosage, Date Prescribed] or a valid End date.'),
+                  ));
+                }
               },
               color: AppColorPallete.color,
               minWidth: double.infinity,

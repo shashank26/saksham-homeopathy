@@ -71,28 +71,11 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
 
         FirestoreCollection.isWhiteListed(OTPAuth.currentUser.phoneNumber)
             .listen((doc) {
-          if (doc.documents.length > 0) {
-            setState(() {
-              this.widgets[1] = ChatPage(new ChatService(OTPAuth.adminId),
-                  ProfileInfo.fromMap(value.data), _isVisible.stream);
-            });
-          } else {
-            setState(() {
-              this.widgets[1] = Container(
-                child: Center(
-                  child: Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        'Please subscribe or contact your doctor to access chat.',
-                        style: TextStyle(
-                          color: AppColorPallete.textColor,
-                          fontSize: 16,
-                        ),
-                      )),
-                ),
-              );
-            });
-          }
+          setState(() {
+            this.widgets[1] = ChatPage(new ChatService(OTPAuth.adminId),
+                ProfileInfo.fromMap(value.data), _isVisible.stream,
+                whitelisted: doc.documents.length > 0);
+          });
         });
       });
       _isVisible.add(false);
@@ -120,7 +103,6 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: FadeTransition(
         opacity: animation,

@@ -10,8 +10,8 @@ Future<DateTime> showDateDialog(
   return showDatePicker(
       context: context,
       firstDate: DateTime(DateTime.now().year - 99),
-      initialDate: DateTime.now(),
-      lastDate: DateTime.now(),
+      initialDate: initialDate,
+      lastDate: lastDate,
       builder: (context, child) {
         return Theme(
           child: child,

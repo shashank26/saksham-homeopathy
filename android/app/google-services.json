@@ -15,30 +15,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "370359903366-sm4rrbbvpm6eujkpatql3necgh0k0m8g.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.ibis.saksham_homeopathy",
-            "certificate_hash": "e36ac83461707512ad4c10a35f3041a210bc1db5"
-          }
-        },
-        {
-          "client_id": "370359903366-tric0pgkbiv84hm3ql1n91r0o488m1th.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.ibis.saksham_homeopathy",
-            "certificate_hash": "5d540470b05529cc208faafbe6bda98dccaa6f72"
-          }
-        },
-        {
-          "client_id": "370359903366-1pbbbqbn1rallt0voqvlkghu0opp26ri.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.ibis.saksham_homeopathy",
-            "certificate_hash": "6b26deb8f3e8d0f2c1de68dd0f4d412229df5d45"
-          }
-        },
-        {
           "client_id": "370359903366-o7i3kukh1ct2jnt2vd861pu0lqvj5556.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

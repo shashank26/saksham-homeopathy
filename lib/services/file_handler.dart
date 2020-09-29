@@ -182,11 +182,13 @@ class FileHandler {
     return post;
   }
 
-  Future<AdminPost> uploadPostFile(AdminPost post) {
-    if (post.file.path.endsWith('.mp4')) {
+  Future<AdminPost> uploadPostFile(AdminPost post, MediaType mediaType) {
+    if (MediaType.VIDEO == mediaType) {
       return uploadToYoutube(post);
-    } else {
+    } else if (MediaType.IMAGE == mediaType) {
       return uploadPostImage(post);
+    } else if (MediaType.LINK == mediaType) {
+      return Future.value(post);
     }
   }
 }

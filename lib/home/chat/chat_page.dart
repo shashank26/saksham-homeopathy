@@ -20,9 +20,11 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 
 class ChatPage extends StatefulWidget {
   final ChatService chatService;
+  final bool whitelisted;
   final ProfileInfo _profileInfo;
   final Stream<bool> _isVisibleStream;
-  ChatPage(this.chatService, this._profileInfo, this._isVisibleStream);
+  ChatPage(this.chatService, this._profileInfo, this._isVisibleStream,
+      {this.whitelisted = false});
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -40,6 +42,9 @@ class _ChatPageState extends State<ChatPage> {
   final int batchSize = 20;
   StreamSubscription ss, vis, unread;
   bool shouldScroll = false;
+  int messageSent = 0;
+  String nonWhitlistMessage =
+      'This is a trial period you can send 10 messages to the doctor.';
 
   @override
   initState() {
@@ -106,6 +111,20 @@ class _ChatPageState extends State<ChatPage> {
       setState(() {
         messages = [];
         messages.addAll(event.documents);
+        this.messageSent = messages
+            .where(
+                (element) => element.data['sender'] == OTPAuth.currentUser.uid)
+            .length;
+        if (!widget.whitelisted) {
+          if (this.messageSent > 9) {
+            this.nonWhitlistMessage =
+                'You have reached your quota of 10 messages. Please contact your doctor to subscribe!';
+          } else {
+            this.nonWhitlistMessage =
+                'This is a trial period you can send 10 messages to the doctor.';
+          }
+          setState(() {});
+        }
         // if (shouldScroll) {
         //   _scrollToIndex(messages
         //       .lastIndexWhere((element) => element.data['isRead'] == false));
@@ -215,6 +234,15 @@ class _ChatPageState extends State<ChatPage> {
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
+              if (!widget.whitelisted)
+                Container(
+                  color: AppColorPallete.textColor,
+                  padding: EdgeInsets.all(5),
+                  child: Text(
+                    this.nonWhitlistMessage,
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
               Expanded(
                 child: Align(
                     alignment: FractionalOffset.bottomCenter,
@@ -238,7 +266,7 @@ class _ChatPageState extends State<ChatPage> {
                               child: Container(
                                 child: GestureDetector(
                                   onLongPress: () async {
-                                    if (OTPAuth.currentUser.uid == info.sender)
+                                    if (OTPAuth.currentUser.uid == info.sender && widget.whitelisted)
                                       await showModalBottomSheet(
                                           context: context,
                                           builder: (context) {
@@ -285,46 +313,47 @@ class _ChatPageState extends State<ChatPage> {
                       ],
                     ),
                   )),
-              Container(
-                decoration: BoxDecoration(boxShadow: [
-                  BoxShadow(
-                      color: Color.fromARGB(255, 200, 200, 200),
-                      spreadRadius: 2,
-                      blurRadius: 5)
-                ]),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: 100,
-                  ),
-                  child: CTextFormField(
-                    maxChars: 200,
-                    maxLines: null,
-                    controller: _messageController,
-                    prefixIcon: IconButton(
-                      icon: Icon(Icons.image),
-                      onPressed: () async {
-                        await _uploadImage(_isNewChat);
-                        widget.chatService.sendNotification(
-                            'Image', widget._profileInfo.pushToken);
-                      },
+              if (widget.whitelisted || this.messageSent < 10)
+                Container(
+                  decoration: BoxDecoration(boxShadow: [
+                    BoxShadow(
+                        color: Color.fromARGB(255, 200, 200, 200),
+                        spreadRadius: 2,
+                        blurRadius: 5)
+                  ]),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: 100,
                     ),
-                    suffixIcon: IconButton(
-                      icon: Icon(Icons.send),
-                      onPressed: () async {
-                        // FocusScope.of(context).unfocus();
-                        if (noe(_messageController.text)) {
-                          return;
-                        }
-                        final text = _messageController.text;
-                        widget.chatService.sendMessage(text, _isNewChat);
-                        widget.chatService.sendNotification(
-                            text, widget._profileInfo.pushToken);
-                        _messageController.text = '';
-                      },
+                    child: CTextFormField(
+                      maxChars: 200,
+                      maxLines: null,
+                      controller: _messageController,
+                      prefixIcon: IconButton(
+                        icon: Icon(Icons.image),
+                        onPressed: () async {
+                          await _uploadImage(_isNewChat);
+                          widget.chatService.sendNotification(
+                              'Image', widget._profileInfo.pushToken);
+                        },
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.send),
+                        onPressed: () async {
+                          // FocusScope.of(context).unfocus();
+                          if (noe(_messageController.text)) {
+                            return;
+                          }
+                          final text = _messageController.text;
+                          widget.chatService.sendMessage(text, _isNewChat);
+                          widget.chatService.sendNotification(
+                              text, widget._profileInfo.pushToken);
+                          _messageController.text = '';
+                        },
+                      ),
                     ),
                   ),
-                ),
-              )
+                )
             ],
           ),
         ),

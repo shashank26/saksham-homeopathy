@@ -74,7 +74,7 @@ class YoutubeApiConstants {
 }
 
 class FirebaseConstants {
-  static const bool _DEBUG = false;
+  static const bool _DEBUG = true;
   static const String STORAGE_BUCKET = _DEBUG
       ? 'gs://flutter-learn-3fcb5.appspot.com'
       : 'gs://saksham-homeopathy.appspot.com';
@@ -101,7 +101,7 @@ enum PopupMenuValues {
   EDIT,
 }
 
-enum MediaType { IMAGE, VIDEO }
+enum MediaType { IMAGE, VIDEO, LINK }
 
 enum DialogType { alert, progress }
 
