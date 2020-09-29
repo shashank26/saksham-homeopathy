@@ -94,7 +94,7 @@ class HistoryTile extends StatelessWidget {
                       // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text(
-                          'Date: ',
+                          'Start Date: ',
                           style: TextStyle(fontSize: 16),
                         ),
                         Text(
@@ -102,21 +102,32 @@ class HistoryTile extends StatelessWidget {
                           style: TextStyle(
                               fontStyle: FontStyle.italic, fontSize: 16),
                         ),
-                        Spacer(
-                          flex: 1,
+                      ],
+                    ),
+                    if (!noe(mInfo.getEndDate()))
+                      Row(mainAxisSize: MainAxisSize.max, children: [
+                        Text(
+                          'End Date: ',
+                          style: TextStyle(fontSize: 16),
                         ),
-                        if (!noe(mInfo.getEndDate()))
-                          Text(
-                            'End Date: ',
-                            style: TextStyle(fontSize: 16),
-                          ),
                         Text(
                           mInfo.getEndDate(),
                           style: TextStyle(
                               fontStyle: FontStyle.italic, fontSize: 16),
                         )
-                      ],
-                    ),
+                      ]),
+                    if (!noe(mInfo.getEndDate()))
+                      Row(mainAxisSize: MainAxisSize.max, children: [
+                        Text(
+                          'Number of Days: ',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Text(
+                          mInfo.getDays(),
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic, fontSize: 16),
+                        )
+                      ]),
                     Row(
                       mainAxisSize: MainAxisSize.max,
                       // mainAxisAlignment: MainAxisAlignment.spaceBetween,

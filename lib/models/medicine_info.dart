@@ -38,6 +38,10 @@ class MedicineInfo {
     return '';
   }
 
+  String getDays() {
+    return (DateTime.fromMillisecondsSinceEpoch(this._endDate).difference(DateTime.fromMillisecondsSinceEpoch(this._datePrescribed)).inDays + 1).toString();
+  }
+
   void setEndDate(String date) {
     _endDate = _formatter.parse(date).millisecondsSinceEpoch;
   }
