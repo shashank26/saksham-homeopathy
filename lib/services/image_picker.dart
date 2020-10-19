@@ -49,7 +49,7 @@ class CImagePicker {
     info.file = image;
     final raw = await FlutterImageCompress.compressWithFile(
       image.absolute.path,
-      quality: 5,
+      quality: 20,
     );
     File blurred = File(image.parent.path + '/blurred.png');
     blurred.writeAsBytes(raw);
