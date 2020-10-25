@@ -172,14 +172,6 @@ class _AdminUpdatesState extends State<AdminUpdates> {
     );
   }
 
-  _expandableText(String text) {
-    if (noe(text)) {
-      return Container();
-    }
-    
-    return ExpandableText(text);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,7 +232,7 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                                 Material(
                                   child: Padding(
                                       padding: const EdgeInsets.all(10),
-                                      child: _expandableText(_post.text)),
+                                      child: ExpandableText(_post.text)),
                                 ),
                                 Visibility(
                                   visible: !noe(_post.fileName),

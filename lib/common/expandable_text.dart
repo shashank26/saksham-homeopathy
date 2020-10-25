@@ -13,18 +13,14 @@ class ExpandableText extends StatefulWidget {
 }
 
 class _ExpandableTextState extends State<ExpandableText> {
-  String visibleText;
+  
   bool expand = false;
 
   @override
-  void initState() {
-    super.initState();
-    visibleText =
-        widget.text.length > 300 ? widget.text.substring(0, 300) : widget.text;
-  }
-
-  @override
   Widget build(BuildContext context) {
+    if (noe(widget.text)) {
+      return Container();
+    }
     return Wrap(
       children: [
         Linkify(
@@ -35,7 +31,7 @@ class _ExpandableTextState extends State<ExpandableText> {
                 // throw 'Could not launch ${link.url}';
               }
             },
-            text: expand ? widget.text : visibleText,
+            text: expand ? widget.text : widget.text.length > 300 ? widget.text.substring(0, 300) : widget.text,
             style: TextStyle(
                 color: AppColorPallete.textColor,
                 fontSize: 20,
