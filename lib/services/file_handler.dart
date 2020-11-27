@@ -78,10 +78,10 @@ class FileHandler {
     return await image.writeAsBytes(file.readAsBytesSync());
   }
 
-  Future<File> getFile(String url, String fileName) async {
+  Future<File> getFile(String url, String fileName, {bool replace = false}) async {
     final path = '$applicationDirectoryPath/$fileName';
     File img = File(path);
-    if (!img.existsSync()) {
+    if (!img.existsSync() || replace) {
       FileInfo info = await _cacheManager.downloadFile(url);
       img = await writeFile(info.file, fileName);
     }

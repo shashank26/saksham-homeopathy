@@ -267,7 +267,8 @@ class _AddPostState extends State<AddPost> {
                         if (!noe(link)) {
                           File thumbnail = await FileHandler.instance.getFile(
                               YoutubeApiConstants.thumbnail(link),
-                              'thumbnail.png');
+                              'thumbnail.png',
+                              replace: true);
                           selectedMediaType = MediaType.LINK;
                           setState(() {
                             _post.file = thumbnail;

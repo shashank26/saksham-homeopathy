@@ -2,11 +2,11 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/custom_dialog.dart';
+import 'package:saksham_homeopathy/common/expandable_text.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/common/network_or_file_image.dart';
 import 'package:saksham_homeopathy/home/admin_updates/add_post.dart';
@@ -25,66 +25,7 @@ class AdminUpdates extends StatefulWidget {
 }
 
 class _AdminUpdatesState extends State<AdminUpdates> {
-  // GoogleSignInAccount _currentUser;
-  // String _contactText;
-  // _handleYoutube() {
-  //   GoogleSignIn _googleSignIn = GoogleSignIn(
-  //     scopes: <String>[
-  //       'email',
-  //       'https://www.googleapis.com/auth/youtube',
-  //     ],
-  //   );
-
-  //   _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
-  //     setState(() {
-  //       _currentUser = account;
-  //     });
-  //     if (_currentUser != null) {
-  //       _handleGetContact();
-  //     }
-  //   });
-  //   _googleSignIn.signIn();
-  // }
-
-  // Future<void> _handleGetContact() async {
-  //   setState(() {
-  //     _contactText = "Loading contact info...";
-  //   });
-
-  //   File f = await CImagePicker.getVideo(ImageSource.camera);
-  //   File g = await f.rename(f.path + '.mp4');
-
-  //   final authHeaders = await _currentUser.authHeaders;
-  //   final httpClient = GoogleHttpClient(authHeaders);
-
-  //   var yt = YoutubeApi(httpClient);
-  //   var res = await yt.videos
-  //       .list('snippet,contentDetails,statistics', myRating: 'like');
-  //   print(res.items.length);
-
-  //   Video video = new Video();
-
-  //   // Add the snippet object property to the Video object.
-  //   VideoSnippet snippet = new VideoSnippet();
-  //   snippet.categoryId = "22";
-  //   snippet.description = "Description of uploaded video.";
-  //   snippet.title = "Test video upload.";
-  //   video.snippet = snippet;
-
-  //   // Add the status object property to the Video object.
-  //   VideoStatus status = new VideoStatus();
-  //   status.privacyStatus = "public";
-  //   video.status = status;
-  //   Media m = Media(g.openRead(), g.lengthSync());
-  // yt.Video vid;//await yt.videos.insert(video, 'snippet,status', uploadMedia: m);
-  // yt.VideoPlayer player;
-  //   print(vid.id);
-  //   await Future.delayed(Duration(seconds: 30));
-  //   var red = yt.videos.delete(vid.id);
-
-  //   print(red);
-  // }
-
+  
   int batch = 1;
   int batchSize = 20;
   final scrollController = new ScrollController();
@@ -231,68 +172,6 @@ class _AdminUpdatesState extends State<AdminUpdates> {
     );
   }
 
-  _expandableText(String text) {
-    if (noe(text)) {
-      return Container();
-    }
-    String firstHalf = text.length > 300 ? text.substring(0, 300) : text;
-    return Wrap(
-      children: [
-        Linkify(
-            onOpen: (link) async {
-              if (await canLaunch(link.url)) {
-                await launch(link.url);
-              } else {
-                // throw 'Could not launch ${link.url}';
-              }
-            },
-            text: firstHalf,
-            style: TextStyle(
-                color: AppColorPallete.textColor,
-                fontSize: 20,
-                fontWeight: FontWeight.w500)),
-        if (text.length > 300)
-          GestureDetector(
-            onTap: () {
-              showDialog(
-                context: context,
-                child: Material(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.chevron_left),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Text(text,
-                                style: TextStyle(
-                                    color: AppColorPallete.textColor,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w400)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-            child: Text(' read more...',
-                style: TextStyle(
-                    color: Colors.lightBlueAccent,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500)),
-          )
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -353,7 +232,7 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                                 Material(
                                   child: Padding(
                                       padding: const EdgeInsets.all(10),
-                                      child: _expandableText(_post.text)),
+                                      child: ExpandableText(_post.text)),
                                 ),
                                 Visibility(
                                   visible: !noe(_post.fileName),
