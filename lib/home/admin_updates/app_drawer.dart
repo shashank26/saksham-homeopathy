@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/common/network_or_file_image.dart';
+import 'package:saksham_homeopathy/home/admin_updates/about_us.dart';
+import 'package:saksham_homeopathy/home/admin_updates/dos_and_donts.dart';
 import 'package:saksham_homeopathy/home/admin_updates/testimonials.dart';
 import 'package:saksham_homeopathy/home/admin_updates/user_stats.dart';
 import 'package:saksham_homeopathy/models/profile_info.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
+import 'drawer_option.dart';
 
 class AppDrawer extends StatelessWidget {
   _navigate(context, Widget widget) {
@@ -64,48 +67,12 @@ class AppDrawer extends StatelessWidget {
           Expanded(
             child: ListView(
               children: [
-                Material(
-                  elevation: 2,
-                  child: InkWell(
-                    onTap: () {
-                      _navigate(context, Testimonials());
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'Testimonials',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontStyle: FontStyle.italic,
-                            fontWeight: FontWeight.w600,
-                            color: AppColorPallete.textColor),
-                      ),
-                    ),
-                  ),
-                ),
+                DrawerOption('About Us', () => _navigate(context, AboutUs())),
+                DrawerOption('Do\'s and Don\'ts', () => _navigate(context, DosAndDonts())),
+                DrawerOption('Testimonials', () => _navigate(context, Testimonials())),
                 Visibility(
                   visible: OTPAuth.isAdmin,
-                  child: Material(
-                    elevation: 2,
-                    child: InkWell(
-                      onTap: () {
-                        _navigate(context, UserStats());
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          'User stats',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.w600,
-                              color: AppColorPallete.textColor),
-                        ),
-                      ),
-                    ),
-                  ),
+                  child: DrawerOption('User Stats', () => _navigate(context, UserStats())),
                 )
               ],
             ),

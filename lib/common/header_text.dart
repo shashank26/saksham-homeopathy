@@ -7,7 +7,8 @@ class HeaderText extends StatelessWidget {
   final double size;
   final TextAlign align;
   final Color color;
-  HeaderText(this._text, {this.size: 30, this.align: TextAlign.center, this.color: AppColorPallete.textColor});
+  final bool underline;
+  HeaderText(this._text, {this.size: 30, this.align: TextAlign.center, this.color: AppColorPallete.textColor, this.underline: false});
   @override
   Widget build(BuildContext context) {
     return Text(
@@ -17,6 +18,7 @@ class HeaderText extends StatelessWidget {
         fontFamily: 'Raleway',
         fontSize: this.size,
         fontWeight: FontWeight.w900,
+        decoration: underline ? TextDecoration.underline : TextDecoration.none
       ),
       textAlign: this.align,
     );

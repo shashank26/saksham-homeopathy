@@ -9,7 +9,8 @@ import 'package:saksham_homeopathy/services/chat_service.dart';
 class ProfileAvatar extends StatefulWidget {
   final String uid;
   final bool showName;
-  ProfileAvatar(this.uid, {this.showName = true});
+  final double radius;
+  ProfileAvatar(this.uid, {this.showName = true, this.radius = 15});
 
   @override
   _ProfileAvatarState createState() => _ProfileAvatarState();
@@ -26,7 +27,7 @@ class _ProfileAvatarState extends State<ProfileAvatar> {
             return Row(
               children: <Widget>[
                 CircleAvatar(
-                  radius: 15,
+                  radius: widget.radius,
                   child: ClipOval(
                     child: NetworkOrFileImage(
                       _profileInfo.photoUrl,

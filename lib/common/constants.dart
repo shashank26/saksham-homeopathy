@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 class AppColorPallete {
-  static const Color color = Color(0xFFF7AFB2);
+  // static const Color color = Color(0xFFF7AFB2);
+  static const Color color = Color(0xFFDEB887);
   static const Color backgroundColor = Color(0xFFFFFFFF);
   static const Color textColor = Color(0xFF5C6773);
 }
@@ -66,6 +67,10 @@ class FirestoreCollection {
       .collection('testimonials')
       .orderBy('timeStamp', descending: true)
       .limit(size);
+  static final aboutUs = () => Firestore.instance
+      .collection('about_us').snapshots();
+      static final dosAndDonts = () => Firestore.instance
+      .collection('dos_and_donts').snapshots();
 }
 
 class YoutubeApiConstants {
@@ -81,6 +86,7 @@ class FirebaseConstants {
   static const String MESSAGING_TOKEN = _DEBUG
       ? 'AAAAIXZAUp8:APA91bHyOoGRZxlFOigzTbS828tmbgSQCH7bBnQo9Mjz2L1F8xxgMqaLcO7qhKUjjCfrxJabxsxZ8aMPx-b4V60AbF7vlm9HRQ-fRlFW6XWw0mW1Ro8mwoDAVBubNlFC1tSBsRlytRJF'
       : 'AAAAVjsrpIY:APA91bG_k_WlY3uAmmKln8wX3SyrU-f-Rz4sh_YLkNaoon6ckv8xLJ63f_zrMRmQsInKEPlMOt9Z8fKOObgdhsVv_hheAzivRIUeNQBNCEWWK1sTrr7TKNTKhFmvoyfU2k-pa777OcFN';
+  static const String ABOUT_US_SEPARATOR = '<----->';
 }
 
 enum LoginState {

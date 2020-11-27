@@ -45,17 +45,7 @@ class _HistoryViewState extends State<HistoryView> {
     showDialog(
         context: context,
         builder: (BuildContext bc) {
-          return Scaffold(
-            appBar: AppBar(
-              iconTheme: IconThemeData(color: Colors.white),
-            ),
-            body: SingleChildScrollView(
-              child: Container(
-                padding: EdgeInsets.all(20),
-                child: AddMedicineForm(widget.user),
-              ),
-            ),
-          );
+          return AddMedicineForm(widget.user);
         });
   }
 
