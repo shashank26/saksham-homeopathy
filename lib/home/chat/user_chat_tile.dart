@@ -60,7 +60,7 @@ class _UserChatTileState extends State<UserChatTile> {
               stream: ChatService.getUserInfo(widget.uid),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  _profileInfo = ProfileInfo.fromMap(snapshot.data.data);
+                  _profileInfo = ProfileInfo.fromMap(snapshot.data.data());
                   widget._callback(widget.uid, _profileInfo);
                   return Row(
                     mainAxisSize: MainAxisSize.max,

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/custom_dialog.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/common/network_or_file_image.dart';
+import 'package:saksham_homeopathy/common/youtube_player.dart';
 import 'package:saksham_homeopathy/models/admin_post.dart';
 import 'package:saksham_homeopathy/services/file_handler.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
@@ -72,31 +75,18 @@ class _TestimonialsState extends State<Testimonials> {
                   color: Colors.white,
                 ),
                 onPressed: () async {
-                  final androidInfo = await DeviceInfoPlugin().androidInfo;
-                  final sdkInt = androidInfo.version.sdkInt;
-                  if (sdkInt < 20) {
-                    await launch(YoutubeApiConstants.embedUrl(_post.fileUrl));
-                    return;
+                  if (Platform.isAndroid) {
+                    final androidInfo = await DeviceInfoPlugin().androidInfo;
+                    final sdkInt = androidInfo.version.sdkInt;
+                    if (sdkInt < 20) {
+                      await launch(YoutubeApiConstants.embedUrl(_post.fileUrl));
+                      return;
+                    }
                   }
                   Navigator.of(context).push(PageRouteBuilder(
                       opaque: false,
                       pageBuilder: (BuildContext context, _, __) {
-                        YoutubePlayerController _controller =
-                            YoutubePlayerController(
-                          initialVideoId: _post.fileUrl,
-                          flags: YoutubePlayerFlags(
-                            autoPlay: true,
-                            mute: false,
-                          ),
-                        );
-                        return YoutubePlayer(
-                          controller: _controller,
-                          showVideoProgressIndicator: false,
-                          progressIndicatorColor: AppColorPallete.color,
-                          onReady: () {
-                            _controller.addListener(() {});
-                          },
-                        );
+                        return CYoutubePlayer(_post.fileUrl);
                       }));
                 },
               )),
@@ -168,14 +158,14 @@ class _TestimonialsState extends State<Testimonials> {
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData &&
-                        snapshot.data.documents.length > 0) {
-                      this.countOfPosts = snapshot.data.documents.length;
+                        snapshot.data.docs.length > 0) {
+                      this.countOfPosts = snapshot.data.docs.length;
                       return ListView.builder(
                         controller: scrollController,
-                        itemCount: snapshot.data.documents.length,
+                        itemCount: snapshot.data.docs.length,
                         itemBuilder: (context, index) {
                           final _post = AdminPost.fromMap(
-                              snapshot.data.documents[index].data);
+                              snapshot.data.docs[index].data());
                           return Container(
                             padding: EdgeInsets.all(5),
                             width: MediaQuery.of(context).size.width,
@@ -226,7 +216,7 @@ class _TestimonialsState extends State<Testimonials> {
                                                 await _deleteConfirmDialog(
                                                     snapshot
                                                         .data
-                                                        .documents[index]
+                                                        .docs[index]
                                                         .reference,
                                                     _post);
 

@@ -12,7 +12,7 @@ import 'google_auth.dart';
 
 class FileHandler {
   final FirebaseStorage _storage =
-      FirebaseStorage(storageBucket: FirebaseConstants.STORAGE_BUCKET);
+      FirebaseStorage.instanceFor(app: FirebaseConstants.app, bucket: FirebaseConstants.STORAGE_BUCKET);
   String applicationDirectoryPath;
   DefaultCacheManager _cacheManager;
   static FileHandler instance;
@@ -54,15 +54,15 @@ class FileHandler {
     return fileUrl;
   }
 
-  Stream<StorageTaskEvent> uploadFileWithStatus(File file, String fileName) {
-    StorageUploadTask task = _storage.ref().child(fileName).putFile(file);
-    return task.events;
+  Stream<TaskSnapshot> uploadFileWithStatus(File file, String fileName) {
+    UploadTask task = _storage.ref().child(fileName).putFile(file);
+    return task.snapshotEvents;
   }
 
   Future<String> _uploadFile(File file, String fileName) async {
-    StorageUploadTask task = _storage.ref().child(fileName).putFile(file);
-    StorageTaskSnapshot snapshot = await task.onComplete;
-    if (!task.isSuccessful)
+    UploadTask task = _storage.ref().child(fileName).putFile(file);
+    TaskSnapshot snapshot = await Future.value(task);
+    if (task.snapshot.state != TaskState.success)
       throw new Exception('Failed to send the image! Please try again.');
     return await snapshot.ref.getDownloadURL();
   }

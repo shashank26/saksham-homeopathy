@@ -5,5 +5,5 @@ import 'constants.dart';
 
 typedef void AuthCallBack(LoginState loginState, String verificationId);
 typedef void PhotoUploadCallBack(double progress, List<MessageImageInfo> messageImageInfo);
-typedef String ImageMessagePath(FirebaseUser user);
-typedef String ProfilePhotoPath(FirebaseUser user);
+typedef String ImageMessagePath(User user);
+typedef String ProfilePhotoPath(User user);

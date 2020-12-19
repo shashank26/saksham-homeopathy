@@ -24,6 +24,7 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
+  FocusNode _otpFocusNode;
   LoginState _loginState = LoginState.verficationStart;
   String _phoneNumber, _otp;
   String _verificationId;
@@ -54,6 +55,9 @@ class _LoginFormState extends State<LoginForm> {
       case LoginState.otpSent:
         setState(() {
           this._loginState = loginState;
+          if (loginState == LoginState.otpSent) {
+            _otpFocusNode.requestFocus();
+          }
         });
         this._verificationId = verificationId;
         Navigator.pop(context);
@@ -73,6 +77,13 @@ class _LoginFormState extends State<LoginForm> {
   @override
   void initState() {
     super.initState();
+    _otpFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _otpFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -86,12 +97,13 @@ class _LoginFormState extends State<LoginForm> {
             child: Center(child: HeaderText('Saksham\nHomeopathy')),
           ),
           TextFormField(
+            autofocus: true,
             onSaved: (value) {
               if (value.isNotEmpty) _phoneNumber = value;
             },
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
-              WhitelistingTextInputFormatter.digitsOnly
+              FilteringTextInputFormatter.digitsOnly
             ],
             decoration: InputDecoration(
               filled: true,
@@ -125,12 +137,13 @@ class _LoginFormState extends State<LoginForm> {
           ),
           if (_loginState == LoginState.otpSent)
             TextFormField(
+              focusNode: _otpFocusNode,
               onSaved: (value) {
                 if (value.isNotEmpty) _otp = value;
               },
               keyboardType: TextInputType.number,
               inputFormatters: <TextInputFormatter>[
-                WhitelistingTextInputFormatter.digitsOnly
+                FilteringTextInputFormatter.digitsOnly
               ],
               decoration: InputDecoration(
                 filled: true,

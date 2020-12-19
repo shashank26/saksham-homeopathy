@@ -90,32 +90,32 @@ class _AdminChatPageState extends State<AdminChatPage>
                     stream: ChatService.getChatListStream(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        if (snapshot.data.documents.length == 0) {
+                        if (snapshot.data.docs.length == 0) {
                           return Center(
                               child: Text(
                             "No chats initiated.",
                             style: TextStyle(color: AppColorPallete.textColor),
                           ));
                         }
-                        final docSnapshot = snapshot.data.documents;
+                        final docSnapshot = snapshot.data.docs;
                         return ListView.builder(
                             itemCount: isSearching
                                 ? _searchedRefs.length
                                 : docSnapshot.length,
                             itemBuilder: (context, index) {
                               _chatStreamRef.putIfAbsent(
-                                  docSnapshot[index].documentID,
+                                  docSnapshot[index].id,
                                   () => FirestoreCollection.chat(
-                                      docSnapshot[index].documentID));
+                                      docSnapshot[index].id));
                               return isSearching
                                   ? UserChatTile(
                                       _searchedRefs[index].key,
                                       _searchedRefs[index].value,
                                       (String uid, ProfileInfo info) {})
                                   : UserChatTile(
-                                      docSnapshot[index].documentID,
+                                      docSnapshot[index].id,
                                       _chatStreamRef[
-                                          docSnapshot[index].documentID],
+                                          docSnapshot[index].id],
                                       (String uid, ProfileInfo info) {
                                       _profiles.putIfAbsent(uid, () => info);
                                     });

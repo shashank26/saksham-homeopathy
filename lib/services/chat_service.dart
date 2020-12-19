@@ -17,7 +17,7 @@ class ChatService {
   String _sender;
   String receiver;
   CollectionReference _chatRef;
-  FirebaseUser _user = OTPAuth.currentUser;
+  User _user = OTPAuth.currentUser;
   FileHandler _fileHandler = FileHandler.instance;
   String chatId;
   static StreamController<Map<String, bool>> unreadStreamController;
@@ -41,12 +41,12 @@ class ChatService {
         .orderBy('timeStamp', descending: true)
         .startAfterDocument(after)
         .limit(10)
-        .getDocuments();
+        .get();
   }
 
   updateTimestamp(bool isNewChat) async {
     await FirestoreCollection.userChatDocument(chatId)
-        .setData({'latestTimestamp': DateTime.now()});
+        .set({'latestTimestamp': DateTime.now()});
   }
 
   Future sendMessage(String message, bool isNewChat) async {
@@ -119,12 +119,12 @@ class ChatService {
     if (images != null) {
       final oldImage = info.fileName;
       final oldFile = info.file;
-      images.fileName = ImagePath.profilePhotoPath(userDocRef.documentID);
+      images.fileName = ImagePath.profilePhotoPath(userDocRef.id);
       uploadStarted();
       ProfileInfo uploadedImages =
           await FileHandler.instance.uploadProfilePhoto(images);
       imageCache.clear();
-      await userDocRef.updateData(ProfileInfo.toMap(uploadedImages));
+      await userDocRef.update(ProfileInfo.toMap(uploadedImages));
       if (!noe(oldImage) && oldFile != null) {
         await FileHandler.instance.deleteCloudFile(oldImage);
         FileHandler.instance.deleteRaw(oldFile);
@@ -157,8 +157,8 @@ class ChatService {
   static StreamSubscription<QuerySnapshot> unreadMessageStream() {
     return FirestoreCollection.latestMessage(OTPAuth.currentUser.uid)
         .listen((event) {
-      if (event.documents.length == 1) {
-        MessageInfo info = MessageInfo.fromMap(event.documents[0].data);
+      if (event.docs.length == 1) {
+        MessageInfo info = MessageInfo.fromMap(event.docs[0].data());
         ChatService.unreadStreamController.add(Map.fromEntries([
           MapEntry(OTPAuth.currentUser.uid,
               info.sender != OTPAuth.currentUser.uid && !info.isRead)

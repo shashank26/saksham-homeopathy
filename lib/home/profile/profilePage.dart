@@ -17,7 +17,7 @@ import 'package:saksham_homeopathy/services/push_notification.dart';
 
 class ProfilePage extends StatefulWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseUser user = OTPAuth.currentUser;
+  final User user = OTPAuth.currentUser;
 
   ProfilePage();
 
@@ -92,7 +92,7 @@ class _ProfilePageState extends State<ProfilePage> {
           .millisecondsSinceEpoch;
       _profileInfo.displayName = _displayNameController.text.trim();
       Map<String, dynamic> data = ProfileInfo.toMap(_profileInfo);
-      _userDocRef.updateData(data);
+      _userDocRef.update(data);
       _hideSnackBar();
       _showSnackBar('Updated');
     } catch (e) {
@@ -138,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage> {
           stream: FirestoreCollection.profileStream(OTPAuth.currentUser.uid),
           builder: (_, snapshot) {
             if (snapshot.hasData) {
-              _setProfileInfo(snapshot.data.data);
+              _setProfileInfo(snapshot.data.data());
               return SingleChildScrollView(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),

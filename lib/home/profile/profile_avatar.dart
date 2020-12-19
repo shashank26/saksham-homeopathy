@@ -23,7 +23,7 @@ class _ProfileAvatarState extends State<ProfileAvatar> {
         stream: ChatService.getUserInfo(widget.uid),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            final _profileInfo = ProfileInfo.fromMap(snapshot.data.data);
+            final _profileInfo = ProfileInfo.fromMap(snapshot.data.data());
             return Row(
               children: <Widget>[
                 CircleAvatar(

@@ -8,7 +8,7 @@ import 'package:saksham_homeopathy/models/profile_info.dart';
 
 class UserStats extends StatelessWidget {
   final futureList = Future.wait(
-      [FirestoreCollection.whiteList().getDocuments(), FirestoreCollection.getActiveUsers()]);
+      [FirestoreCollection.whiteList().get(), FirestoreCollection.getActiveUsers()]);
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +24,12 @@ class UserStats extends StatelessWidget {
           if (!snapshot.hasData) {
             return ConnectingPage();
           }
-          final activeUsers = snapshot.data[1].documents
-              .map((e) => ProfileInfo.fromMap(e.data))
+          final activeUsers = snapshot.data[1].docs
+              .map((e) => ProfileInfo.fromMap(e.data()))
               .where((element) => element.isAdmin != true)
               .toList();
-          List<Map> whitelist = snapshot.data[0].documents
-              .map((e) => { 'phoneNumber' : e.data['phoneNumber'].toString(), 'documentReference' : e.reference})
+          List<Map> whitelist = snapshot.data[0].docs
+              .map((e) => { 'phoneNumber' : e.data()['phoneNumber'].toString(), 'documentReference' : e.reference})
               .toList();
           final subscribedActiveUsers = activeUsers
               .where((element) => whitelist.indexWhere((e) => e['phoneNumber'] == element.phoneNumber) != -1);

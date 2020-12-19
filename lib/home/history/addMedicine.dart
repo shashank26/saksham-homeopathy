@@ -13,7 +13,7 @@ class AddMedicineForm extends StatelessWidget {
   final _dosageController = new TextEditingController(text: '');
   final _endDateController = new TextEditingController(text: '');
   final MedicineInfo _medicineInfo = MedicineInfo();
-  final FirebaseUser user;
+  final User user;
 
   AddMedicineForm(this.user);
 

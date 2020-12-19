@@ -30,10 +30,10 @@ class PushNotification {
 
     firebaseMessaging.getToken().then((token) async {
       print('token: $token');
-      await Firestore.instance
+      await FirebaseFirestore.instance
           .collection('users')
-          .document(OTPAuth.currentUser.uid)
-          .updateData({'pushToken': token});
+          .doc(OTPAuth.currentUser.uid)
+          .update({'pushToken': token});
     }).catchError((err) {
       // Fluttertoast.showToast(msg: err.message.toString());
     });

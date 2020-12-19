@@ -34,7 +34,7 @@ class AppDrawer extends StatelessWidget {
                 if (!snapshot.hasData) {
                   return Container();
                 }
-                ProfileInfo _info = ProfileInfo.fromMap(snapshot.data.data);
+                ProfileInfo _info = ProfileInfo.fromMap(snapshot.data.data());
                 return DrawerHeader(
                     margin: EdgeInsets.all(0),
                     padding: EdgeInsets.all(0),

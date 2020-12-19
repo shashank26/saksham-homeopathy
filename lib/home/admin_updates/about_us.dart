@@ -36,7 +36,7 @@ class AboutUs extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Html(
-                        data: snapshot.data.documents.first.data['content'],
+                        data: snapshot.data.docs.first.data()['content'],
                         style: {
                           'div': Style(
                             fontFamily: 'Times New Roman',

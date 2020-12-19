@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:encrypt/encrypt.dart' as enc;
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class AppColorPallete {
   // static const Color color = Color(0xFFF7AFB2);
@@ -26,50 +27,50 @@ class ImagePath {
 }
 
 class FirestoreCollection {
-  static final addMedicine = (String uid) => Firestore.instance
+  static final addMedicine = (String uid) => FirebaseFirestore.instance
       .collection('medicines')
-      .document(uid)
+      .doc(uid)
       .collection('medicines');
-  static final chat = (String uid) => Firestore.instance
+  static final chat = (String uid) => FirebaseFirestore.instance
       .collection('messages')
-      .document(uid)
+      .doc(uid)
       .collection('chat');
   static final latestMessage = (String uid) =>
       chat(uid).orderBy('timeStamp', descending: true).limit(1).snapshots();
   static final userChatDocument =
-      (String uid) => Firestore.instance.collection('messages').document(uid);
-  static final messages = Firestore.instance.collection('messages');
+      (String uid) => FirebaseFirestore.instance.collection('messages').doc(uid);
+  static final messages = FirebaseFirestore.instance.collection('messages');
   static final userInfo =
-      (String uid) => Firestore.instance.collection('users').document(uid);
-  static final getAdminInfo = () => Firestore.instance
+      (String uid) => FirebaseFirestore.instance.collection('users').doc(uid);
+  static final getAdminInfo = () => FirebaseFirestore.instance
       .collection('users')
       .where('isAdmin', isEqualTo: true)
       .snapshots()
       .first;
-  static final adminUpdates = (int size) => Firestore.instance
+  static final adminUpdates = (int size) => FirebaseFirestore.instance
       .collection('adminUpdates')
       .orderBy('timeStamp', descending: true)
       .limit(size);
-  static final postUpdate = Firestore.instance.collection('adminUpdates');
-  static final postTestimonial = Firestore.instance.collection('testimonials');
+  static final postUpdate = FirebaseFirestore.instance.collection('adminUpdates');
+  static final postTestimonial = FirebaseFirestore.instance.collection('testimonials');
   static final profileStream =
       (uid) => FirestoreCollection.userInfo(uid).snapshots();
-  static final isWhiteListed = (phoneNumber) => Firestore.instance
+  static final isWhiteListed = (phoneNumber) => FirebaseFirestore.instance
       .collection('whitelist')
       .where('phoneNumber', isEqualTo: phoneNumber)
       .snapshots();
   static final updateRequired =
-      () => Firestore.instance.collection('update').snapshots();
+      () => FirebaseFirestore.instance.collection('update').snapshots();
   static final getActiveUsers =
-      () => Firestore.instance.collection('users').getDocuments();
-  static final whiteList = () => Firestore.instance.collection('whitelist');
-  static final testimonials = (int size) => Firestore.instance
+      () => FirebaseFirestore.instance.collection('users').get();
+  static final whiteList = () => FirebaseFirestore.instance.collection('whitelist');
+  static final testimonials = (int size) => FirebaseFirestore.instance
       .collection('testimonials')
       .orderBy('timeStamp', descending: true)
       .limit(size);
-  static final aboutUs = () => Firestore.instance
+  static final aboutUs = () => FirebaseFirestore.instance
       .collection('about_us').snapshots();
-      static final dosAndDonts = () => Firestore.instance
+      static final dosAndDonts = () => FirebaseFirestore.instance
       .collection('dos_and_donts').snapshots();
 }
 
@@ -79,6 +80,7 @@ class YoutubeApiConstants {
 }
 
 class FirebaseConstants {
+  static FirebaseApp app;
   static const bool _DEBUG = false;
   static const String STORAGE_BUCKET = _DEBUG
       ? 'gs://flutter-learn-3fcb5.appspot.com'

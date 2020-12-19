@@ -48,7 +48,7 @@ class HistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MedicineInfo mInfo = MedicineInfo.fromMap(info.data);
+    MedicineInfo mInfo = MedicineInfo.fromMap(info.data());
     return MaterialButton(
       color: Colors.white,
       onPressed: () {},

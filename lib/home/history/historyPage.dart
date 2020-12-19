@@ -9,7 +9,7 @@ import 'package:saksham_homeopathy/home/history/medicineHistoryTile.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
 
 class HistoryView extends StatefulWidget {
-  final FirebaseUser user;
+  final User user;
   final String uid;
   HistoryView({this.user, this.uid});
 
@@ -109,7 +109,7 @@ class _HistoryViewState extends State<HistoryView> {
                           if (!noe(val)) {
                             setState(() {
                               medicineSearchResult = medicineInfoList
-                                  .where((element) => element.data['name']
+                                  .where((element) => element.data()['name']
                                       .toString().toLowerCase()
                                       .startsWith(val.toLowerCase()))
                                   .toList();

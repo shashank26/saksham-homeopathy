@@ -33,7 +33,7 @@ class DosAndDonts extends StatelessWidget {
 
             return SingleChildScrollView(
                           child: Html(
-                data: snapshot.data.documents.first.data['content'],
+                data: snapshot.data.docs.first.data()['content'],
                 style: {
                   'div': Style(
                     textAlign: TextAlign.left,

@@ -11,7 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class MessageBubble extends StatelessWidget {
   final MessageInfo info;
-  final FirebaseUser user = OTPAuth.currentUser;
+  final User user = OTPAuth.currentUser;
 
   MessageBubble(this.info);
 
