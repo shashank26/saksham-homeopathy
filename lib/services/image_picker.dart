@@ -7,6 +7,8 @@ import 'package:saksham_homeopathy/models/profile_info.dart';
 
 class CImagePicker {
   static ImagePicker _picker = ImagePicker();
+  static Function greaterThan1MB =
+      (File file) => file.lengthSync() / (1024.0 * 1024.0) > 1;
 
   static Future<PickedFile> _getRawImage(ImageSource source) async {
     try {
@@ -83,6 +85,25 @@ class CImagePicker {
 
     final File image =
         croppedImage == null ? File(rawImage.path) : croppedImage;
+    return image;
+  }
+
+  static Future<File> getLowResImage(ImageSource source) async {
+    PickedFile rawImage = await _getRawImage(source);
+    if (rawImage == null) return null;
+
+    File croppedImage = await _getCroppedImage(rawImage.path);
+
+    final File image =
+        croppedImage == null ? File(rawImage.path) : croppedImage;
+
+    if (greaterThan1MB(image)) {
+      final raw = await FlutterImageCompress.compressWithFile(
+        image.absolute.path,
+        quality: 20,
+      );
+      return File.fromRawPath(raw);
+    }
     return image;
   }
 

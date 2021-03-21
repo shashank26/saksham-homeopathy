@@ -34,7 +34,7 @@ class _AdminChatPageState extends State<AdminChatPage>
           child: HeaderText(
             "Chats",
             align: TextAlign.left,
-            size: 40,
+            size: 20,
           ),
         ),
         actions: [

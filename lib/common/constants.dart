@@ -21,8 +21,9 @@ class ImagePath {
       (String uid) => 'photoUrl/$uid/${Uuid().v1()}.png';
   static final imageMessagePath =
       (String uid) => 'messages/$uid/${Uuid().v1()}.png';
-  static final imagePostPath = () =>
-      'adminPosts/${Uuid().v1()}.png';
+  static final imageCertificationsPath =
+      () => '${Uuid().v1()}.png';
+  static final imagePostPath = () => 'adminPosts/${Uuid().v1()}.png';
 }
 
 class FirestoreCollection {
@@ -67,15 +68,19 @@ class FirestoreCollection {
       .collection('testimonials')
       .orderBy('timeStamp', descending: true)
       .limit(size);
-  static final aboutUs = () => Firestore.instance
-      .collection('about_us').snapshots();
-      static final dosAndDonts = () => Firestore.instance
-      .collection('dos_and_donts').snapshots();
+  static final aboutUs =
+      () => Firestore.instance.collection('about_us').snapshots();
+  static final dosAndDonts =
+      () => Firestore.instance.collection('dos_and_donts').snapshots();
+  static final certifications =
+      () => Firestore.instance.collection('certifications');
 }
 
 class YoutubeApiConstants {
-  static final thumbnail = (String id) => 'https://img.youtube.com/vi/$id/sddefault.jpg';
-  static final embedUrl = (String id) => 'https://www.youtube.com/embed/$id?autoplay=1&mute=1';
+  static final thumbnail =
+      (String id) => 'https://img.youtube.com/vi/$id/sddefault.jpg';
+  static final embedUrl =
+      (String id) => 'https://www.youtube.com/embed/$id?autoplay=1&mute=1';
 }
 
 class FirebaseConstants {
@@ -86,7 +91,6 @@ class FirebaseConstants {
   static const String MESSAGING_TOKEN = _DEBUG
       ? 'AAAAIXZAUp8:APA91bHyOoGRZxlFOigzTbS828tmbgSQCH7bBnQo9Mjz2L1F8xxgMqaLcO7qhKUjjCfrxJabxsxZ8aMPx-b4V60AbF7vlm9HRQ-fRlFW6XWw0mW1Ro8mwoDAVBubNlFC1tSBsRlytRJF'
       : 'AAAAVjsrpIY:APA91bG_k_WlY3uAmmKln8wX3SyrU-f-Rz4sh_YLkNaoon6ckv8xLJ63f_zrMRmQsInKEPlMOt9Z8fKOObgdhsVv_hheAzivRIUeNQBNCEWWK1sTrr7TKNTKhFmvoyfU2k-pa777OcFN';
-  static const String ABOUT_US_SEPARATOR = '<----->';
 }
 
 enum LoginState {

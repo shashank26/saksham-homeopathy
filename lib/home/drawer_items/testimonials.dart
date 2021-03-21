@@ -154,7 +154,7 @@ class _TestimonialsState extends State<Testimonials> {
               child: HeaderText(
                 "Testimonials",
                 align: TextAlign.left,
-                size: 40,
+                size: 20,
               )),
         ),
         body: Container(

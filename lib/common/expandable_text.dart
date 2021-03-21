@@ -33,9 +33,10 @@ class _ExpandableTextState extends State<ExpandableText> {
             },
             text: expand ? widget.text : widget.text.length > 300 ? widget.text.substring(0, 300) : widget.text,
             style: TextStyle(
-                color: AppColorPallete.textColor,
-                fontSize: 20,
-                fontWeight: FontWeight.w500)),
+              fontFamily: 'Roboto',
+                color: Color(0xFF444444),
+                fontSize: 18,
+                fontWeight: FontWeight.w400)),
         if (widget.text.length > 300)
           GestureDetector(
             onTap: () {
@@ -45,9 +46,10 @@ class _ExpandableTextState extends State<ExpandableText> {
             },
             child: Text(expand ? 'read less...' : 'read more...',
                 style: TextStyle(
-                    color: Colors.lightBlueAccent,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500)),
+                    color: Colors.blue,
+                    fontSize: 17,
+                    fontFamily: 'Raleway',
+                    fontWeight: FontWeight.w400)),
           ),
       ],
     );

@@ -35,6 +35,10 @@ class FileHandler {
     return file;
   }
 
+  String getAbsolutePath(String fileName) {
+    return "$applicationDirectoryPath/$fileName";
+  }
+
   Future<ProfileInfo> uploadProfilePhoto(ProfileInfo file,
       {Function callBack}) async {
     file.photoUrl = await _uploadFile(file.file, file.fileName);

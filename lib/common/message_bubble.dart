@@ -4,6 +4,7 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/network_or_file_image.dart';
+import 'package:saksham_homeopathy/common/photo_preview_dialog.dart';
 import 'package:saksham_homeopathy/models/message_info.dart';
 import 'package:saksham_homeopathy/services/file_handler.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
@@ -47,25 +48,7 @@ class MessageBubble extends StatelessWidget {
                               onTap: () {
                                 if (FileHandler.instance
                                     .exists(fileName: info.fileName)) {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return Scaffold(
-                                          appBar: AppBar(
-                                            backgroundColor: AppColorPallete.backgroundColor,
-                                            iconTheme: IconThemeData(color: AppColorPallete.textColor),
-                                          ),
-                                          body: Container(
-                                            child: PhotoView(
-                                                imageProvider: FileImage(
-                                                    FileHandler
-                                                        .instance
-                                                        .getRawFile(
-                                                            fileName: info
-                                                                .fileName))),
-                                          ),
-                                        );
-                                      });
+                                      previewPhoto(context, info.fileName);
                                 }
                               },
                               child: NetworkOrFileImage(

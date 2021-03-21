@@ -9,6 +9,7 @@ import 'package:saksham_homeopathy/common/custom_dialog.dart';
 import 'package:saksham_homeopathy/common/expandable_text.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/common/network_or_file_image.dart';
+import 'package:saksham_homeopathy/common/photo_preview_dialog.dart';
 import 'package:saksham_homeopathy/home/admin_updates/add_post.dart';
 import 'package:saksham_homeopathy/home/admin_updates/app_drawer.dart';
 import 'package:saksham_homeopathy/home/profile/preview_profile.dart';
@@ -185,7 +186,7 @@ class _AdminUpdatesState extends State<AdminUpdates> {
             child: HeaderText(
               "Updates",
               align: TextAlign.left,
-              size: 40,
+              size: 20,
             )),
         actions: [
           if (OTPAuth.isAdmin)
@@ -245,28 +246,7 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                                             ? _getVideoPreview(_post)
                                             : GestureDetector(
                                                 onTap: () {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (context) {
-                                                        return Scaffold(
-                                                          appBar: AppBar(
-                                                            backgroundColor:
-                                                                AppColorPallete
-                                                                    .backgroundColor,
-                                                            iconTheme: IconThemeData(
-                                                                color: AppColorPallete
-                                                                    .textColor),
-                                                          ),
-                                                          body: Container(
-                                                            child: PhotoView(
-                                                                imageProvider: FileImage(FileHandler
-                                                                    .instance
-                                                                    .getRawFile(
-                                                                        fileName:
-                                                                            _post.fileName))),
-                                                          ),
-                                                        );
-                                                      });
+                                                  previewPhoto(context, _post.fileName);
                                                 },
                                                 child: NetworkOrFileImage(
                                                   _post.fileUrl,

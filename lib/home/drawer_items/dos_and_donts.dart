@@ -19,7 +19,7 @@ class DosAndDonts extends StatelessWidget {
             child: HeaderText(
               "Do\'s and Don\'ts",
               align: TextAlign.left,
-              size: 40,
+              size: 20,
             )),
       ),
       body: Container(

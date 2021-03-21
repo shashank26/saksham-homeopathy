@@ -21,7 +21,7 @@ class AboutUs extends StatelessWidget {
             child: HeaderText(
               "About Us",
               align: TextAlign.left,
-              size: 40,
+              size: 20,
             )),
       ),
       body: Container(

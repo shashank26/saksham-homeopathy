@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:saksham_homeopathy/common/CTextFormField.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
+import 'package:saksham_homeopathy/common/image_modal_nottom_sheet_dialog.dart';
 import 'package:saksham_homeopathy/common/image_source_bottom_sheet.dart';
 import 'package:saksham_homeopathy/common/message_bubble.dart';
 import 'package:saksham_homeopathy/home/history/historyPage.dart';
@@ -137,13 +138,9 @@ class _ChatPageState extends State<ChatPage> {
 
   _uploadImage(bool isNewChat) async {
     ImageSource _imageSource;
-    await showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.transparent,
-        barrierColor: Colors.black.withOpacity(0.5),
-        builder: (context) => ImageSourceBottomSheet((ImageSource imageSource) {
-              _imageSource = imageSource;
-            }));
+    await pickImageSource(context, (ImageSource imageSource) {
+      _imageSource = imageSource;
+    });
     if (_imageSource != null) {
       try {
         setState(() {
@@ -266,7 +263,9 @@ class _ChatPageState extends State<ChatPage> {
                               child: Container(
                                 child: GestureDetector(
                                   onLongPress: () async {
-                                    if (OTPAuth.currentUser.uid == info.sender && widget.whitelisted)
+                                    if (OTPAuth.currentUser.uid ==
+                                            info.sender &&
+                                        widget.whitelisted)
                                       await showModalBottomSheet(
                                           context: context,
                                           builder: (context) {

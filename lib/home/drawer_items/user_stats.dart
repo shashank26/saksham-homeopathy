@@ -16,7 +16,7 @@ class UserStats extends StatelessWidget {
       appBar: AppBar(
         iconTheme: IconThemeData(color: AppColorPallete.textColor),
         backgroundColor: AppColorPallete.backgroundColor,
-        title: HeaderText('User Stats'),
+        title: HeaderText('User Stats', size: 20,),
       ),
       body: FutureBuilder<List<QuerySnapshot>>(
         future: futureList,
