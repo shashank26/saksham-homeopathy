@@ -17,9 +17,10 @@ class AddMedicineForm extends StatelessWidget {
 
   AddMedicineForm(this.user);
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: AppColorPallete.textColor),

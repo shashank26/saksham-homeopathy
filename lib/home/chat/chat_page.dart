@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:saksham_homeopathy/common/CTextFormField.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
-import 'package:saksham_homeopathy/common/image_modal_nottom_sheet_dialog.dart';
+import 'package:saksham_homeopathy/common/image_modal_bottom_sheet_dialog.dart';
 import 'package:saksham_homeopathy/common/image_source_bottom_sheet.dart';
 import 'package:saksham_homeopathy/common/message_bubble.dart';
 import 'package:saksham_homeopathy/home/history/historyPage.dart';

@@ -4,14 +4,18 @@ import 'constants.dart';
 
 Future<DateTime> showDateDialog(
     {@required BuildContext context,
-    @required DateTime firstDate,
+    DateTime firstDate,
     @required DateTime initialDate,
-    @required DateTime lastDate}) {
+    @required DateTime lastDate,
+    bool Function(DateTime) selectableDayPredicate}) {
+      firstDate ?? DateTime(DateTime.now().year - 99);
   return showDatePicker(
       context: context,
-      firstDate: DateTime(DateTime.now().year - 99),
+      firstDate: firstDate,
       initialDate: initialDate,
       lastDate: lastDate,
+      initialDatePickerMode: DatePickerMode.day,
+      selectableDayPredicate: selectableDayPredicate,
       builder: (context, child) {
         return Theme(
           child: child,

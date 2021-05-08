@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/custom_dialog.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
-import 'package:saksham_homeopathy/common/image_modal_nottom_sheet_dialog.dart';
+import 'package:saksham_homeopathy/common/image_modal_bottom_sheet_dialog.dart';
 import 'package:saksham_homeopathy/common/image_source_bottom_sheet.dart';
 import 'package:saksham_homeopathy/home/admin_updates/file_view.dart';
 import 'package:saksham_homeopathy/models/admin_post.dart';

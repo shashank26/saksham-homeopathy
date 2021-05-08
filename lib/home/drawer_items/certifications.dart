@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
-import 'package:saksham_homeopathy/common/image_modal_nottom_sheet_dialog.dart';
+import 'package:saksham_homeopathy/common/image_modal_bottom_sheet_dialog.dart';
 import 'package:saksham_homeopathy/common/image_swipe_view.dart';
 import 'package:saksham_homeopathy/common/network_or_file_image.dart';
 import 'package:saksham_homeopathy/services/file_handler.dart';
@@ -19,10 +19,10 @@ class _CertificationsState extends State<Certifications> {
   DocumentSnapshot _documentSnapshot;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List _uploadedImages = [];
-  // final imageURL = (String imageName) =>
-  //     "https://firebasestorage.googleapis.com/v0/b/flutter-learn-3fcb5.appspot.com/o/certifications%2F$imageName?alt=media";
   final imageURL = (String imageName) =>
-      "https://firebasestorage.googleapis.com/v0/b/saksham-homeopathy.appspot.com/o/certifications%2F$imageName?alt=media";
+      "https://firebasestorage.googleapis.com/v0/b/flutter-learn-3fcb5.appspot.com/o/certifications%2F$imageName?alt=media";
+  // final imageURL = (String imageName) =>
+  //     "https://firebasestorage.googleapis.com/v0/b/saksham-homeopathy.appspot.com/o/certifications%2F$imageName?alt=media";
   final imagePath = (String imageName) => "certifications/$imageName";
 
   @override

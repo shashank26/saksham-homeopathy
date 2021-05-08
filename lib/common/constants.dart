@@ -21,8 +21,7 @@ class ImagePath {
       (String uid) => 'photoUrl/$uid/${Uuid().v1()}.png';
   static final imageMessagePath =
       (String uid) => 'messages/$uid/${Uuid().v1()}.png';
-  static final imageCertificationsPath =
-      () => '${Uuid().v1()}.png';
+  static final imageCertificationsPath = () => '${Uuid().v1()}.png';
   static final imagePostPath = () => 'adminPosts/${Uuid().v1()}.png';
 }
 
@@ -74,6 +73,8 @@ class FirestoreCollection {
       () => Firestore.instance.collection('dos_and_donts').snapshots();
   static final certifications =
       () => Firestore.instance.collection('certifications');
+
+  static final bookings = () => Firestore.instance.collection('bookings');
 }
 
 class YoutubeApiConstants {
@@ -84,7 +85,7 @@ class YoutubeApiConstants {
 }
 
 class FirebaseConstants {
-  static const bool _DEBUG = false;
+  static const bool _DEBUG = true;
   static const String STORAGE_BUCKET = _DEBUG
       ? 'gs://flutter-learn-3fcb5.appspot.com'
       : 'gs://saksham-homeopathy.appspot.com';
