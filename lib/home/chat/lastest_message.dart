@@ -31,9 +31,9 @@ class _LatestMessageState extends State<LatestMessage> {
     return StreamBuilder<QuerySnapshot>(
         stream: this.widget.latestMessageStream,
         builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data.documents.length > 0) {
+          if (snapshot.hasData && snapshot.data.docs.length > 0) {
             MessageInfo info =
-                MessageInfo.fromMap(snapshot.data.documents[0].data);
+                MessageInfo.fromMap(snapshot.data.docs[0].data());
             updateUnreadChats(info);
             bool unread = isUnread(info);
             return Row(

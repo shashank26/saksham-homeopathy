@@ -24,8 +24,8 @@ class BookingService {
         ._bookingCollection
         .where('slotDate',
             isLessThan: DateTime(date.year, date.month, date.day))
-        .getDocuments();
-    snapshot.documents.forEach((element) {
+        .get();
+    snapshot.docs.forEach((element) {
       element.reference.delete();
     });
   }
@@ -33,16 +33,15 @@ class BookingService {
   Future<List<DocumentSnapshot>> getCurrentBookings(DateTime date,
       {SlotType slotType}) async {
     if (slotType == null) {
-      QuerySnapshot snapshot = await _bookingCollection
-          .where('slotDate', isEqualTo: date)
-          .getDocuments();
-      return snapshot.documents.toList();
+      QuerySnapshot snapshot =
+          await _bookingCollection.where('slotDate', isEqualTo: date).get();
+      return snapshot.docs.toList();
     } else {
       QuerySnapshot snapshot = await _bookingCollection
           .where('slotDate', isEqualTo: date)
           .where('slotType', isEqualTo: slotType.index)
-          .getDocuments();
-      return snapshot.documents.toList();
+          .get();
+      return snapshot.docs.toList();
     }
   }
 
@@ -51,8 +50,8 @@ class BookingService {
   }
 
   Future<bool> isBookingValid(SlotBooking booking) async {
-    List<SlotBooking> bookings = this
-        .getSlotBookingList(await this.getCurrentBookings(booking.slotDate, slotType: booking.slotType));
+    List<SlotBooking> bookings = this.getSlotBookingList(await this
+        .getCurrentBookings(booking.slotDate, slotType: booking.slotType));
     return bookings.length == 0;
   }
 
@@ -69,7 +68,7 @@ class BookingService {
   }
 
   Future<ProfileInfo> getUserInfo(String uid) async {
-    final data = (await FirestoreCollection.userInfo(uid).get()).data;
+    final data = (await FirestoreCollection.userInfo(uid).get()).data();
     return ProfileInfo.fromMap(data);
   }
 

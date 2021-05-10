@@ -7,19 +7,19 @@ import 'package:saksham_homeopathy/models/profile_info.dart';
 
 class OTPAuth {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  final firestore = Firestore.instance;
-  Stream<FirebaseUser> onAuthStateChanged;
+  final firestore = FirebaseFirestore.instance;
+  Stream<User> onAuthStateChanged;
   final String _countryCode = '+91';
   AuthCallBack _authCallBack;
   static OTPAuth instance;
   static bool isAdmin = false;
-  static FirebaseUser currentUser;
+  static User currentUser;
   static String adminId;
   static ProfileInfo adminProfile;
   static ProfileInfo currentUserProfile;
 
   OTPAuth._() {
-    this.onAuthStateChanged = firebaseAuth.onAuthStateChanged;
+    this.onAuthStateChanged = firebaseAuth.authStateChanges();
   }
 
   static OTPAuth instantiate() {
@@ -30,20 +30,24 @@ class OTPAuth {
   }
 
   static Future<void> initializeInfo() async {
-    currentUser = await FirebaseAuth.instance.currentUser();
+    currentUser = FirebaseAuth.instance.currentUser;
     DocumentSnapshot ds =
         await FirestoreCollection.userInfo(currentUser.uid).get();
-    isAdmin = ds.data['isAdmin'] == true;
-    final adminDocument = (await FirestoreCollection.getAdminInfo()).documents[0];
-    adminProfile = ProfileInfo.fromMap(adminDocument.data);
-    adminId = adminDocument.documentID;
+    Map<String, dynamic> data = ds.data();
+    isAdmin = data['isAdmin'] == true;
+    final adminDocument = (await FirestoreCollection.getAdminInfo()).docs[0];
+    adminProfile = ProfileInfo.fromMap(adminDocument.data());
+    adminId = adminDocument.id;
   }
 
-  Future<void> initializeUserProfile(FirebaseUser user) async {
-    await firestore.collection('users').document(user.uid).setData(
-        ProfileInfo.toMap(
-            ProfileInfo(displayName: '', dateOfBirth: null, photoUrl: '', fileName: '', phoneNumber: user.phoneNumber)));
-    // PushNotification.registerNotification();
+  Future<void> initializeUserProfile(User user) async {
+    await firestore.collection('users').doc(user.uid).set(ProfileInfo.toMap(
+        ProfileInfo(
+            displayName: '',
+            dateOfBirth: null,
+            photoUrl: '',
+            fileName: '',
+            phoneNumber: user.phoneNumber)));
   }
 
   Future authenticate(String phoneNumber, AuthCallBack authCallBack) async {
@@ -59,13 +63,13 @@ class OTPAuth {
 
   Future verifyOTP(
       String verificationId, String smsCode, AuthCallBack authCallBack) async {
-    final AuthCredential authCredential = PhoneAuthProvider.getCredential(
+    final AuthCredential authCredential = PhoneAuthProvider.credential(
         verificationId: verificationId, smsCode: smsCode);
 
     try {
-      final AuthResult authResult =
+      final UserCredential authResult =
           await firebaseAuth.signInWithCredential(authCredential);
-      final user = await firebaseAuth.currentUser();
+      final user = firebaseAuth.currentUser;
       if (authResult.additionalUserInfo.isNewUser) {
         await initializeUserProfile(user);
       }
@@ -81,7 +85,7 @@ class OTPAuth {
     }
   }
 
-  void phoneVerificationFailed(AuthException aex) {
+  void phoneVerificationFailed(FirebaseAuthException aex) {
     print(aex.message);
   }
 

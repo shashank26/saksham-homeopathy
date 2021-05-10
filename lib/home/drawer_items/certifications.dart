@@ -19,10 +19,8 @@ class _CertificationsState extends State<Certifications> {
   DocumentSnapshot _documentSnapshot;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List _uploadedImages = [];
-  final imageURL = (String imageName) =>
-      "https://firebasestorage.googleapis.com/v0/b/flutter-learn-3fcb5.appspot.com/o/certifications%2F$imageName?alt=media";
-  // final imageURL = (String imageName) =>
-  //     "https://firebasestorage.googleapis.com/v0/b/saksham-homeopathy.appspot.com/o/certifications%2F$imageName?alt=media";
+  final imageURL =
+      (String imageName) => FirebaseConstants.certificationsImageURL(imageName);
   final imagePath = (String imageName) => "certifications/$imageName";
 
   @override
@@ -43,7 +41,7 @@ class _CertificationsState extends State<Certifications> {
       final imageName = ImagePath.imageCertificationsPath();
       await FileHandler.instance.uploadFile(_image, this.imagePath(imageName));
       _uploadedImages.add(imageName);
-      await _documentSnapshot.reference.updateData({'images': _uploadedImages});
+      await _documentSnapshot.reference.update({'images': _uploadedImages});
       scaffoldKey.currentState.showSnackBar(SnackBar(
         content: Text('Completed'),
       ));
@@ -69,7 +67,7 @@ class _CertificationsState extends State<Certifications> {
                           .deleteCloudFile(this.imagePath(imageName));
                       _uploadedImages.removeWhere((e) => e == imageName);
                       _documentSnapshot.reference
-                          .updateData({'images': _uploadedImages});
+                          .update({'images': _uploadedImages});
                     },
                     child: Text("Delete")),
                 FlatButton(
@@ -93,7 +91,10 @@ class _CertificationsState extends State<Certifications> {
           visible: OTPAuth.isAdmin,
           child: FloatingActionButton(
               backgroundColor: AppColorPallete.color,
-              child: Icon(Icons.image, color: AppColorPallete.backgroundColor,),
+              child: Icon(
+                Icons.image,
+                color: AppColorPallete.backgroundColor,
+              ),
               onPressed: () async {
                 await _uploadCertificate();
               }),
@@ -117,17 +118,15 @@ class _CertificationsState extends State<Certifications> {
                 child: StreamBuilder<QuerySnapshot>(
                   stream: FirestoreCollection.certifications().snapshots(),
                   builder: (context, snapshot) {
-                    if (snapshot.hasData &&
-                        snapshot.data.documents.length > 0) {
-                      _documentSnapshot = snapshot.data.documents.first;
-                      _uploadedImages = _documentSnapshot.data['images'];
+                    if (snapshot.hasData && snapshot.data.docs.length > 0) {
+                      _documentSnapshot = snapshot.data.docs.first;
+                      _uploadedImages = _documentSnapshot.get('images');
                       if (_uploadedImages.length > 0) {
                         return GridView.builder(
                             itemCount: _uploadedImages.length,
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 1,
-                                    mainAxisSpacing: 10.0),
+                                    crossAxisCount: 1, mainAxisSpacing: 10.0),
                             itemBuilder: (context, index) {
                               final imageName =
                                   _uploadedImages[index].toString();

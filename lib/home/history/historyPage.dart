@@ -9,7 +9,7 @@ import 'package:saksham_homeopathy/home/history/medicineHistoryTile.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
 
 class HistoryView extends StatefulWidget {
-  final FirebaseUser user;
+  final User user;
   final String uid;
   HistoryView({this.user, this.uid});
 
@@ -36,7 +36,10 @@ class _HistoryViewState extends State<HistoryView> {
     }
 
     _historyStream = FirestoreCollection.addMedicine(widget.uid)
-        .where('datePrescribed', isGreaterThan: DateTime.now().subtract(Duration(days: 40)).millisecondsSinceEpoch)
+        .where('datePrescribed',
+            isGreaterThan: DateTime.now()
+                .subtract(Duration(days: 40))
+                .millisecondsSinceEpoch)
         .orderBy('datePrescribed')
         .snapshots();
   }
@@ -93,13 +96,14 @@ class _HistoryViewState extends State<HistoryView> {
           ),
         ),
         body: Padding(
-          padding: const EdgeInsets.only(top : 8.0),
+          padding: const EdgeInsets.only(top: 8.0),
           child: Column(
             children: <Widget>[
               Visibility(
                 visible: isSearching,
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0, left: 8, right: 8),
+                  padding:
+                      const EdgeInsets.only(bottom: 8.0, left: 8, right: 8),
                   child: Column(
                     children: [
                       CTextFormField(
@@ -109,8 +113,10 @@ class _HistoryViewState extends State<HistoryView> {
                           if (!noe(val)) {
                             setState(() {
                               medicineSearchResult = medicineInfoList
-                                  .where((element) => element.data['name']
-                                      .toString().toLowerCase()
+                                  .where((element) => element
+                                      .get('name')
+                                      .toString()
+                                      .toLowerCase()
                                       .startsWith(val.toLowerCase()))
                                   .toList();
                             });
@@ -126,7 +132,7 @@ class _HistoryViewState extends State<HistoryView> {
                     stream: _historyStream,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        if (snapshot.data.documents.length > 0) {
+                        if (snapshot.data.docs.length > 0) {
                           medicineInfoList = snapshot.data.documents;
                           return ListView.builder(
                             itemCount: isSearching
@@ -141,7 +147,8 @@ class _HistoryViewState extends State<HistoryView> {
                             },
                           );
                         } else {
-                          return Center(child: HeaderText('No Medicines added.'));
+                          return Center(
+                              child: HeaderText('No Medicines added.'));
                         }
                       }
                       return Center(child: HeaderText('Loading...'));

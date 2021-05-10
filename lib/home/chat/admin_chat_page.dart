@@ -39,22 +39,22 @@ class _AdminChatPageState extends State<AdminChatPage>
         ),
         actions: [
           IconButton(
-                    icon: isSearching ? Icon(Icons.close) : Icon(Icons.search),
-                    onPressed: () {
-                      setState(() {
-                        isSearching = !isSearching;
-                        if (isSearching) {
-                          _searchedRefs = _chatStreamRef.entries.toList();
-                        }
-                      });
-                    },
-                    color: AppColorPallete.textColor,
-                    iconSize: 30,
-                  )
+            icon: isSearching ? Icon(Icons.close) : Icon(Icons.search),
+            onPressed: () {
+              setState(() {
+                isSearching = !isSearching;
+                if (isSearching) {
+                  _searchedRefs = _chatStreamRef.entries.toList();
+                }
+              });
+            },
+            color: AppColorPallete.textColor,
+            iconSize: 30,
+          )
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.only(top : 8),
+        padding: const EdgeInsets.only(top: 8),
         child: Column(
           children: [
             Visibility(
@@ -69,7 +69,9 @@ class _AdminChatPageState extends State<AdminChatPage>
                       onChanged: (val) {
                         final filtered = HashMap.fromEntries(_profiles.entries
                             .where((entry) =>
-                                entry.value.displayName.toLowerCase().startsWith(val.toLowerCase()) ||
+                                entry.value.displayName
+                                    .toLowerCase()
+                                    .startsWith(val.toLowerCase()) ||
                                 entry.value.phoneNumber
                                     .substring(3)
                                     .startsWith(val)));
@@ -90,32 +92,30 @@ class _AdminChatPageState extends State<AdminChatPage>
                     stream: ChatService.getChatListStream(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        if (snapshot.data.documents.length == 0) {
+                        if (snapshot.data.docs.length == 0) {
                           return Center(
                               child: Text(
                             "No chats initiated.",
                             style: TextStyle(color: AppColorPallete.textColor),
                           ));
                         }
-                        final docSnapshot = snapshot.data.documents;
+                        final docSnapshot = snapshot.data.docs;
                         return ListView.builder(
                             itemCount: isSearching
                                 ? _searchedRefs.length
                                 : docSnapshot.length,
                             itemBuilder: (context, index) {
                               _chatStreamRef.putIfAbsent(
-                                  docSnapshot[index].documentID,
+                                  docSnapshot[index].id,
                                   () => FirestoreCollection.chat(
-                                      docSnapshot[index].documentID));
+                                      docSnapshot[index].id));
                               return isSearching
                                   ? UserChatTile(
                                       _searchedRefs[index].key,
                                       _searchedRefs[index].value,
                                       (String uid, ProfileInfo info) {})
-                                  : UserChatTile(
-                                      docSnapshot[index].documentID,
-                                      _chatStreamRef[
-                                          docSnapshot[index].documentID],
+                                  : UserChatTile(docSnapshot[index].id,
+                                      _chatStreamRef[docSnapshot[index].id],
                                       (String uid, ProfileInfo info) {
                                       _profiles.putIfAbsent(uid, () => info);
                                     });

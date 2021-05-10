@@ -41,7 +41,7 @@ class _AddPostState extends State<AddPost> {
       _post = AdminPost();
       return;
     }
-    _post = AdminPost.fromMap(widget._post.data);
+    _post = AdminPost.fromMap(widget._post.data());
     _postText.text = _post.text;
   }
 
@@ -94,7 +94,7 @@ class _AddPostState extends State<AddPost> {
     _showDialog('Posting...');
     _post.timeStamp = DateTime.now();
     if (widget._post != null) {
-      widget._post.reference.updateData(AdminPost.toMap(_post));
+      widget._post.reference.update(AdminPost.toMap(_post));
     } else {
       if (isTestimonial) {
         await FirestoreCollection.postTestimonial.add(AdminPost.toMap(_post));
@@ -110,8 +110,8 @@ class _AddPostState extends State<AddPost> {
 
   _pickMedia(MediaType mediaType) async {
     await pickImageSource(context, (ImageSource imageSource) {
-              _imageSource = imageSource;
-            });
+      _imageSource = imageSource;
+    });
 
     if (_imageSource != null) {
       File media;

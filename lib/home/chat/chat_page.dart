@@ -111,10 +111,10 @@ class _ChatPageState extends State<ChatPage> {
     ss = widget.chatService.getChatStream(batch * batchSize).listen((event) {
       setState(() {
         messages = [];
-        messages.addAll(event.documents);
+        messages.addAll(event.docs);
         this.messageSent = messages
             .where(
-                (element) => element.data['sender'] == OTPAuth.currentUser.uid)
+                (element) => element.get('sender') == OTPAuth.currentUser.uid)
             .length;
         if (!widget.whitelisted) {
           if (this.messageSent > 9) {
@@ -187,7 +187,7 @@ class _ChatPageState extends State<ChatPage> {
   _updateUnreadStatus(MessageInfo info, DocumentReference ref) {
     if (info.isRead == false && info.sender != OTPAuth.currentUser.uid) {
       info.isRead = true;
-      ref.updateData(MessageInfo.toMap(info));
+      ref.update(MessageInfo.toMap(info));
     }
   }
 
@@ -251,7 +251,7 @@ class _ChatPageState extends State<ChatPage> {
                         controller: controller,
                         itemBuilder: (context, index) {
                           MessageInfo info =
-                              MessageInfo.fromMap(messages[index].data);
+                              MessageInfo.fromMap(messages[index].data());
                           _updateUnreadStatus(info, messages[index].reference);
                           return AutoScrollTag(
                             key: ValueKey(index),

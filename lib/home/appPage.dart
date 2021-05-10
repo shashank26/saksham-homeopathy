@@ -16,7 +16,7 @@ import 'package:saksham_homeopathy/services/google_auth.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
 
 class AppPage extends StatefulWidget {
-  final FirebaseUser user = OTPAuth.currentUser;
+  final User user = OTPAuth.currentUser;
 
   @override
   _AppPageState createState() => _AppPageState();
@@ -73,8 +73,8 @@ class _AppPageState extends State<AppPage> with SingleTickerProviderStateMixin {
             .listen((doc) {
           setState(() {
             this.widgets[1] = ChatPage(new ChatService(OTPAuth.adminId),
-                ProfileInfo.fromMap(value.data), _isVisible.stream,
-                whitelisted: doc.documents.length > 0);
+                ProfileInfo.fromMap(value.data()), _isVisible.stream,
+                whitelisted: doc.docs.length > 0);
           });
         });
       });

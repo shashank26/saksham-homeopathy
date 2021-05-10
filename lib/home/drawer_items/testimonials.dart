@@ -121,7 +121,8 @@ class _TestimonialsState extends State<Testimonials> {
                 child: Text('Delete'),
                 onPressed: () async {
                   showDialog(
-                      context: context, child: CustomDialog('Deleting...'));
+                      context: context,
+                      builder: (_) => CustomDialog('Deleting...'));
                   await ref.delete();
                   int count = 0;
                   Navigator.popUntil(context, (route) {
@@ -167,15 +168,14 @@ class _TestimonialsState extends State<Testimonials> {
                           this.batch * this.batchSize)
                       .snapshots(),
                   builder: (context, snapshot) {
-                    if (snapshot.hasData &&
-                        snapshot.data.documents.length > 0) {
-                      this.countOfPosts = snapshot.data.documents.length;
+                    if (snapshot.hasData && snapshot.data.docs.length > 0) {
+                      this.countOfPosts = snapshot.data.docs.length;
                       return ListView.builder(
                         controller: scrollController,
-                        itemCount: snapshot.data.documents.length,
+                        itemCount: snapshot.data.docs.length,
                         itemBuilder: (context, index) {
                           final _post = AdminPost.fromMap(
-                              snapshot.data.documents[index].data);
+                              snapshot.data.docs[index].data());
                           return Container(
                             padding: EdgeInsets.all(5),
                             width: MediaQuery.of(context).size.width,
@@ -224,9 +224,7 @@ class _TestimonialsState extends State<Testimonials> {
                                             switch (value) {
                                               case PopupMenuValues.DELETE:
                                                 await _deleteConfirmDialog(
-                                                    snapshot
-                                                        .data
-                                                        .documents[index]
+                                                    snapshot.data.docs[index]
                                                         .reference,
                                                     _post);
 

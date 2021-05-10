@@ -53,9 +53,9 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
 
   List<Widget> getCancellationWidgets(DocumentSnapshot doc) {
     SlotBooking booking = SlotBooking(
-        slotType: SlotType.values[int.parse((doc.data['slotType'].toString()))],
-        slotDate: (doc.data['slotDate'] as Timestamp).toDate(),
-        uid: doc.data['uid'].toString());
+        slotType: SlotType.values[int.parse((doc.get('slotType').toString()))],
+        slotDate: (doc.get('slotDate') as Timestamp).toDate(),
+        uid: doc.get('uid').toString());
     return [
       Text('You have a booking today at ' + booking.slotType.content),
       MaterialButton(
@@ -73,7 +73,8 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
 
   getBookingsForAdmin(List<DocumentSnapshot> docs) {
     List<Widget> bookings = [];
-    List<SlotBooking> slotBookings = widget.bookingService.getSlotBookingList(docs);
+    List<SlotBooking> slotBookings =
+        widget.bookingService.getSlotBookingList(docs);
     slotBookings.sort((b1, b2) => b1.slotType.index - b2.slotType.index);
     for (int i = 0; i < slotBookings.length; i++) {
       SlotBooking booking = slotBookings[i];
@@ -147,15 +148,14 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
               )),
         ),
         body: FutureBuilder<List<DocumentSnapshot>>(
-            future: widget.bookingService
-                .getCurrentBookings(booking.slotDate),
+            future: widget.bookingService.getCurrentBookings(booking.slotDate),
             builder: (_, snapshot) {
               if (snapshot.hasData) {
                 final bookings =
                     widget.bookingService.getSlotBookingList(snapshot.data);
 
                 List<DocumentSnapshot> hasBooking = snapshot.data
-                    .where((element) => element.data['uid'] == booking.uid)
+                    .where((element) => element.get('uid') == booking.uid)
                     .toList();
 
                 final slots = bookings.map((e) => e.slotType).toList();
@@ -174,7 +174,9 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
                                 buttonTheme: ButtonThemeData(
                                     textTheme: ButtonTextTheme.primary)),
                             child: CalendarDatePicker(
-                              initialDate: booking.slotDate,
+                              initialDate: date.isAfter(booking.slotDate)
+                                  ? date
+                                  : booking.slotDate,
                               firstDate: date,
                               lastDate: date.add(Duration(days: 7)),
                               onDateChanged: (date) {
@@ -197,6 +199,12 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
                                     this.getBookingsForAdmin(snapshot.data),
                               ),
                             ),
+                          if (!OTPAuth.isAdmin)
+                            Center(
+                                child: Text(
+                              "NOTE: 10:15 AM booking is for new patients only!",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            )),
                           if (!OTPAuth.isAdmin)
                             hasBooking.length > 0
                                 ? Column(
@@ -294,7 +302,7 @@ class SlotBooking {
   SlotBooking({this.slotType, this.slotDate, this.uid, this.ref});
 
   static SlotBooking fromMap(DocumentSnapshot snap) {
-    Map map = snap.data;
+    Map map = snap.data();
     return SlotBooking(
         uid: map['uid'].toString(),
         slotType: SlotType.values[int.parse((map['slotType'].toString()))],

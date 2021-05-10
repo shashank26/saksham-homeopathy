@@ -7,6 +7,7 @@ import 'package:saksham_homeopathy/introduction/index.dart';
 import 'package:saksham_homeopathy/services/file_handler.dart';
 import 'package:saksham_homeopathy/services/otp_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'common/constants.dart';
 
@@ -24,34 +25,36 @@ class _LandingPageState extends State<LandingPage> {
   @override
   void initState() {
     super.initState();
+    Firebase.initializeApp().then((value) {
+      FirebaseConstants.app = value;
+      FirestoreCollection.updateRequired().listen((event) async {
+        _initializationFlag =
+            _recommendedUpdateFlag = _requiredUpdateFlag = false;
+        if (event.docs.length == 0) {
+          return;
+        }
+        final packageInfo = await PackageInfo.fromPlatform();
 
-    FirestoreCollection.updateRequired().listen((event) async {
-      _initializationFlag =
-          _recommendedUpdateFlag = _requiredUpdateFlag = false;
-      if (event.documents.length == 0) {
-        return;
-      }
-      final packageInfo = await PackageInfo.fromPlatform();
+        final updateType =
+            UpdateType.values[event.docs.first.get('updateType')];
+        final version = event.docs.first.get('version');
+        final buildNumber = event.docs.first.get('buildNumber');
 
-      final updateType =
-          UpdateType.values[event.documents.first.data['updateType']];
-      final version = event.documents.first.data['version'];
-      final buildNumber = event.documents.first.data['buildNumber'];
+        bool isUpdated = packageInfo.version == version &&
+            packageInfo.buildNumber == buildNumber;
 
-      bool isUpdated = packageInfo.version == version &&
-          packageInfo.buildNumber == buildNumber;
-
-      if (isUpdated) {
-        _init();
-      } else if (updateType == UpdateType.Recommended) {
-        setState(() {
-          _recommendedUpdateFlag = true;
-        });
-      } else if (updateType == UpdateType.Required) {
-        setState(() {
-          _requiredUpdateFlag = true;
-        });
-      }
+        if (isUpdated) {
+          _init();
+        } else if (updateType == UpdateType.Recommended) {
+          setState(() {
+            _recommendedUpdateFlag = true;
+          });
+        } else if (updateType == UpdateType.Required) {
+          setState(() {
+            _requiredUpdateFlag = true;
+          });
+        }
+      });
     });
   }
 
@@ -73,7 +76,7 @@ class _LandingPageState extends State<LandingPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return ConnectingPage();
             }
-            FirebaseUser user = snapshot.data;
+            User user = snapshot.data;
             if (user == null) {
               _isNewLogin = true;
               return Index();

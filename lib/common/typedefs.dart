@@ -4,6 +4,7 @@ import 'package:saksham_homeopathy/models/message_image_info.dart';
 import 'constants.dart';
 
 typedef void AuthCallBack(LoginState loginState, String verificationId);
-typedef void PhotoUploadCallBack(double progress, List<MessageImageInfo> messageImageInfo);
-typedef String ImageMessagePath(FirebaseUser user);
-typedef String ProfilePhotoPath(FirebaseUser user);
+typedef void PhotoUploadCallBack(
+    double progress, List<MessageImageInfo> messageImageInfo);
+typedef String ImageMessagePath(User user);
+typedef String ProfilePhotoPath(User user);

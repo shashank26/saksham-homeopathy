@@ -12,7 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class MessageBubble extends StatelessWidget {
   final MessageInfo info;
-  final FirebaseUser user = OTPAuth.currentUser;
+  final User user = OTPAuth.currentUser;
 
   MessageBubble(this.info);
 
@@ -48,7 +48,7 @@ class MessageBubble extends StatelessWidget {
                               onTap: () {
                                 if (FileHandler.instance
                                     .exists(fileName: info.fileName)) {
-                                      previewPhoto(context, info.fileName);
+                                  previewPhoto(context, info.fileName);
                                 }
                               },
                               child: NetworkOrFileImage(
@@ -66,9 +66,7 @@ class MessageBubble extends StatelessWidget {
                                 }
                               },
                               text: info.message,
-                              style: TextStyle(
-                                fontSize: 18
-                              ),
+                              style: TextStyle(fontSize: 18),
                             ),
                       if (info.sender == user.uid)
                         Container(

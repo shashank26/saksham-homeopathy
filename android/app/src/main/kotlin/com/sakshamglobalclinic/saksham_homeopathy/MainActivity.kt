@@ -1,5 +1,5 @@
-package com.sakshamglobalclinic.saksham_homeopathy
-// package com.ibis.saksham_homeopathy
+// package com.sakshamglobalclinic.saksham_homeopathy
+package com.ibis.saksham_homeopathy
 import android.app.NotificationManager;
 import android.content.Context;
 import androidx.core.content.ContextCompat;

@@ -12,7 +12,7 @@ import 'google_auth.dart';
 
 class FileHandler {
   final FirebaseStorage _storage =
-      FirebaseStorage(storageBucket: FirebaseConstants.STORAGE_BUCKET);
+      FirebaseStorage.instanceFor(bucket: FirebaseConstants.STORAGE_BUCKET);
   String applicationDirectoryPath;
   DefaultCacheManager _cacheManager;
   static FileHandler instance;
@@ -58,15 +58,15 @@ class FileHandler {
     return fileUrl;
   }
 
-  Stream<StorageTaskEvent> uploadFileWithStatus(File file, String fileName) {
-    StorageUploadTask task = _storage.ref().child(fileName).putFile(file);
-    return task.events;
+  Stream<TaskSnapshot> uploadFileWithStatus(File file, String fileName) {
+    UploadTask task = _storage.ref().child(fileName).putFile(file);
+    return task.snapshotEvents;
   }
 
   Future<String> _uploadFile(File file, String fileName) async {
-    StorageUploadTask task = _storage.ref().child(fileName).putFile(file);
-    StorageTaskSnapshot snapshot = await task.onComplete;
-    if (!task.isSuccessful)
+    UploadTask task = _storage.ref().child(fileName).putFile(file);
+    TaskSnapshot snapshot = await Future.value(task);
+    if (task.snapshot.state != TaskState.success)
       throw new Exception('Failed to send the image! Please try again.');
     return await snapshot.ref.getDownloadURL();
   }
@@ -82,7 +82,8 @@ class FileHandler {
     return await image.writeAsBytes(file.readAsBytesSync());
   }
 
-  Future<File> getFile(String url, String fileName, {bool replace = false}) async {
+  Future<File> getFile(String url, String fileName,
+      {bool replace = false}) async {
     final path = '$applicationDirectoryPath/$fileName';
     File img = File(path);
     if (!img.existsSync() || replace) {
@@ -163,7 +164,7 @@ class FileHandler {
 
   Future<AdminPost> uploadToYoutube(AdminPost post) async {
     final client = await GoogleAuth.instance.getClient();
-    var yt = YoutubeApi(client);
+    var yt = YouTubeApi(client);
     Video video = new Video();
 
     VideoSnippet snippet = new VideoSnippet();
@@ -180,7 +181,8 @@ class FileHandler {
     post.file.openRead().listen((event) {
       print(event);
     });
-    Video vid = await yt.videos.insert(video, 'snippet,status', uploadMedia: m);
+    Video vid =
+        await yt.videos.insert(video, ['snippet', 'status'], uploadMedia: m);
     post.fileUrl = vid.id;
     post.videoThumbnail = vid.id;
     return post;

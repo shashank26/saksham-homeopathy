@@ -37,7 +37,7 @@ class AppDrawer extends StatelessWidget {
                 if (!snapshot.hasData) {
                   return Container();
                 }
-                ProfileInfo _info = ProfileInfo.fromMap(snapshot.data.data);
+                ProfileInfo _info = ProfileInfo.fromMap(snapshot.data.data());
                 return DrawerHeader(
                     margin: EdgeInsets.all(0),
                     padding: EdgeInsets.all(0),
@@ -71,13 +71,18 @@ class AppDrawer extends StatelessWidget {
             child: ListView(
               children: [
                 DrawerOption('About Us', () => _navigate(context, AboutUs())),
-                DrawerOption('Do\'s and Don\'ts', () => _navigate(context, DosAndDonts())),
-                DrawerOption('Testimonials', () => _navigate(context, Testimonials())),
-                DrawerOption('Awards and Accolades', () => _navigate(context, Certifications())),
-                DrawerOption('Booking', () => _navigate(context, Booking(new BookingService()))),
+                DrawerOption('Do\'s and Don\'ts',
+                    () => _navigate(context, DosAndDonts())),
+                DrawerOption(
+                    'Testimonials', () => _navigate(context, Testimonials())),
+                DrawerOption('Awards and Accolades',
+                    () => _navigate(context, Certifications())),
+                DrawerOption('Booking',
+                    () => _navigate(context, Booking(new BookingService()))),
                 Visibility(
                   visible: OTPAuth.isAdmin,
-                  child: DrawerOption('User Stats', () => _navigate(context, UserStats())),
+                  child: DrawerOption(
+                      'User Stats', () => _navigate(context, UserStats())),
                 )
               ],
             ),
