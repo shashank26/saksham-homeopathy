@@ -244,7 +244,7 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
                                           booking.slotType = null;
                                         });
                                         Scaffold.of(_).showSnackBar(SnackBar(
-                                          content: Text('Slot not available!'),
+                                          content: Text('Slot not available!!'),
                                         ));
                                       }
                                     }
