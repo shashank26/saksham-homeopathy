@@ -31,6 +31,25 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
     }
   }
 
+  bool _slotTimePast(SlotType slotType) {
+    final currentDate = DateTime.now();
+    final slotHourMinute = slotType.content.split(':');
+    if (currentDate.isBefore(booking.slotDate)) {
+      return false;
+    }
+
+    if (currentDate.hour < int.parse(slotHourMinute[0])) {
+      return false;
+    }
+
+    if (currentDate.hour == int.parse(slotHourMinute[0]) &&
+        currentDate.minute < int.parse(slotHourMinute[1].substring(0, 2))) {
+      return false;
+    }
+
+    return true;
+  }
+
   List<Widget> getSlots(slots) {
     final availableSlots = SlotType.values;
     if (slots.contains(booking.slotType)) {
@@ -39,8 +58,11 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
     return availableSlots
         .map((e) => MaterialButton(
               child: Text(e.content),
-              color: booking.slotType == e ? AppColorPallete.color : null,
-              onPressed: slots.contains(e)
+              elevation: 5,
+              color: booking.slotType == e
+                  ? AppColorPallete.color
+                  : AppColorPallete.backgroundColor,
+              onPressed: (slots.contains(e) || _slotTimePast(e))
                   ? null
                   : () {
                       setState(() {
@@ -57,7 +79,11 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
         slotDate: (doc.get('slotDate') as Timestamp).toDate(),
         uid: doc.get('uid').toString());
     return [
-      Text('You have a booking today at ' + booking.slotType.content),
+      Padding(
+        padding: const EdgeInsets.only(top: 20.0),
+        child: Text('You already have a booking for the selected day at ' +
+            booking.slotType.content),
+      ),
       MaterialButton(
         onPressed: () async {
           await widget.bookingService.cancelBooking(doc.reference);
@@ -127,7 +153,7 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
     }
 
     if (bookings.length == 0) {
-      bookings.add(Center(child: Text('No Bookings for today.')));
+      bookings.add(Center(child: Text('No Bookings for selected day.')));
     }
     return bookings;
   }
@@ -161,59 +187,73 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
                 final slots = bookings.map((e) => e.slotType).toList();
 
                 return Stack(children: [
-                  SingleChildScrollView(
-                    child: Container(
-                      height: MediaQuery.of(context).size.height - 50,
-                      color: Colors.white,
-                      child: Column(
-                        children: [
-                          Theme(
-                            data: ThemeData.light().copyWith(
-                                colorScheme: ColorScheme.light(
-                                    primary: AppColorPallete.color),
-                                buttonTheme: ButtonThemeData(
-                                    textTheme: ButtonTextTheme.primary)),
-                            child: CalendarDatePicker(
-                              initialDate: date.isAfter(booking.slotDate)
-                                  ? date
-                                  : booking.slotDate,
-                              firstDate: date,
-                              lastDate: date.add(Duration(days: 7)),
-                              onDateChanged: (date) {
-                                setState(() {
-                                  booking.slotDate = date;
-                                });
-                              },
-                              selectableDayPredicate: (date) {
-                                return date.weekday != 1;
-                              },
-                            ),
-                          ),
-                          if (OTPAuth.isAdmin)
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              width: MediaQuery.of(context).size.width,
-                              child: Wrap(
-                                spacing: 5,
-                                children:
-                                    this.getBookingsForAdmin(snapshot.data),
+                  Container(
+                    height: MediaQuery.of(context).size.height,
+                    child: SingleChildScrollView(
+                      child: Container(
+                        padding: EdgeInsets.only(bottom: 50),
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            Theme(
+                              data: ThemeData.light().copyWith(
+                                  colorScheme: ColorScheme.light(
+                                      primary: AppColorPallete.color),
+                                  buttonTheme: ButtonThemeData(
+                                      textTheme: ButtonTextTheme.primary)),
+                              child: CalendarDatePicker(
+                                initialDate: date.isAfter(booking.slotDate)
+                                    ? date
+                                    : booking.slotDate,
+                                firstDate: date,
+                                lastDate: date.add(Duration(days: 7)),
+                                onDateChanged: (date) {
+                                  setState(() {
+                                    booking.slotDate = date;
+                                    booking.slotType = null;
+                                  });
+                                },
+                                selectableDayPredicate: (date) {
+                                  return date.weekday != 1;
+                                },
                               ),
                             ),
-                          if (!OTPAuth.isAdmin)
-                            Center(
-                                child: Text(
-                              "NOTE: 10:15 AM booking is for new patients only!",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            )),
-                          if (!OTPAuth.isAdmin)
-                            hasBooking.length > 0
-                                ? Column(
-                                    children: this
-                                        .getCancellationWidgets(hasBooking[0]))
-                                : Wrap(
-                                    children: this.getSlots(slots),
-                                  ),
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 10, left: 10, right: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (OTPAuth.isAdmin)
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Wrap(
+                                        spacing: 5,
+                                        children: this
+                                            .getBookingsForAdmin(snapshot.data),
+                                      ),
+                                    ),
+                                  if (!OTPAuth.isAdmin)
+                                    Text(
+                                      "NOTE: 10:15 AM booking is for new consultation only!",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  if (!OTPAuth.isAdmin)
+                                    hasBooking.length > 0
+                                        ? Column(
+                                            children: this
+                                                .getCancellationWidgets(
+                                                    hasBooking[0]))
+                                        : Wrap(
+                                            spacing: 5,
+                                            children: this.getSlots(slots),
+                                          ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -231,8 +271,9 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
                               onPressed: booking.slotDate != null &&
                                       booking.slotType != null
                                   ? () async {
-                                      if (await widget.bookingService
-                                          .confirmBooking(booking)) {
+                                      if (!_slotTimePast(booking.slotType) &&
+                                          await widget.bookingService
+                                              .confirmBooking(booking)) {
                                         setState(() {
                                           booking.slotType = null;
                                         });
@@ -244,7 +285,7 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
                                           booking.slotType = null;
                                         });
                                         Scaffold.of(_).showSnackBar(SnackBar(
-                                          content: Text('Slot not available!!'),
+                                          content: Text('Slot not available!'),
                                         ));
                                       }
                                     }
