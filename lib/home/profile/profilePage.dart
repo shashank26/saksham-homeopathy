@@ -6,6 +6,7 @@ import 'package:saksham_homeopathy/common/CTextFormField.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/date_dialog.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
+import 'package:saksham_homeopathy/common/image_modal_bottom_sheet_dialog.dart';
 import 'package:saksham_homeopathy/common/image_source_bottom_sheet.dart';
 import 'package:saksham_homeopathy/common/network_or_file_image.dart';
 import 'package:saksham_homeopathy/introduction/connecting.dart';
@@ -17,7 +18,7 @@ import 'package:saksham_homeopathy/services/push_notification.dart';
 
 class ProfilePage extends StatefulWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseUser user = OTPAuth.currentUser;
+  final User user = OTPAuth.currentUser;
 
   ProfilePage();
 
@@ -63,14 +64,9 @@ class _ProfilePageState extends State<ProfilePage> {
   _uploadProfilePhoto() async {
     try {
       ImageSource _imageSource;
-      await showModalBottomSheet(
-          backgroundColor: Colors.transparent,
-          barrierColor: Colors.black.withOpacity(0.5),
-          context: context,
-          builder: (context) =>
-              ImageSourceBottomSheet((ImageSource imageSource) {
-                _imageSource = imageSource;
-              }));
+      await pickImageSource(context, (ImageSource imageSource) {
+        _imageSource = imageSource;
+      });
       if (_imageSource != null) {
         await ChatService.setProfilePhoto(_profileInfo, _userDocRef, () {
           _showSnackBar('Uploading profile photo...',
@@ -92,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
           .millisecondsSinceEpoch;
       _profileInfo.displayName = _displayNameController.text.trim();
       Map<String, dynamic> data = ProfileInfo.toMap(_profileInfo);
-      _userDocRef.updateData(data);
+      _userDocRef.update(data);
       _hideSnackBar();
       _showSnackBar('Updated');
     } catch (e) {
@@ -130,7 +126,7 @@ class _ProfilePageState extends State<ProfilePage> {
           child: HeaderText(
             "Profile",
             align: TextAlign.left,
-            size: 40,
+            size: 20,
           ),
         ),
       ),
@@ -138,7 +134,7 @@ class _ProfilePageState extends State<ProfilePage> {
           stream: FirestoreCollection.profileStream(OTPAuth.currentUser.uid),
           builder: (_, snapshot) {
             if (snapshot.hasData) {
-              _setProfileInfo(snapshot.data.data);
+              _setProfileInfo(snapshot.data.data());
               return SingleChildScrollView(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
@@ -298,7 +294,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       onPressed: () async {
                                         _showSnackBar('Logging out...');
                                         await PushNotification.firebaseMessaging
-                                            .deleteInstanceID();
+                                            .deleteToken();
                                         if (OTPAuth.isAdmin) {
                                           await GoogleAuth.instance.signOut();
                                         }

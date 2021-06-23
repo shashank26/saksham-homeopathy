@@ -26,7 +26,8 @@ class HistoryTile extends StatelessWidget {
                 child: Text('Delete'),
                 onPressed: () async {
                   showDialog(
-                      context: context, child: CustomDialog('Deleting...'));
+                      context: context,
+                      builder: (_) => CustomDialog('Deleting...'));
                   await info.reference.delete();
                   int count = 0;
                   Navigator.popUntil(context, (route) {
@@ -48,7 +49,7 @@ class HistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MedicineInfo mInfo = MedicineInfo.fromMap(info.data);
+    MedicineInfo mInfo = MedicineInfo.fromMap(info.data());
     return MaterialButton(
       color: Colors.white,
       onPressed: () {},

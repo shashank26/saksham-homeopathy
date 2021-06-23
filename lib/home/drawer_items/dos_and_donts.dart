@@ -19,38 +19,33 @@ class DosAndDonts extends StatelessWidget {
             child: HeaderText(
               "Do\'s and Don\'ts",
               align: TextAlign.left,
-              size: 40,
+              size: 20,
             )),
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         child: StreamBuilder<QuerySnapshot>(
-          stream: FirestoreCollection.dosAndDonts(),
-          builder: (ctx, snapshot) {
-            if (!snapshot.hasData) {
-              return ConnectingPage();
-            }
+            stream: FirestoreCollection.dosAndDonts(),
+            builder: (ctx, snapshot) {
+              if (!snapshot.hasData) {
+                return ConnectingPage();
+              }
 
-            return SingleChildScrollView(
-                          child: Html(
-                data: snapshot.data.documents.first.data['content'],
-                style: {
-                  'div': Style(
-                    textAlign: TextAlign.left,
-                    fontSize: FontSize(20),
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'Times New Roman',
-                    color: Colors.black87
-                  ),
-                  'li': Style(
-                    margin: EdgeInsets.only(top: 15)
-                  )
-                },
-              ),
-              
-            );
-          }
-        ),
+              return SingleChildScrollView(
+                child: Html(
+                  data: snapshot.data.docs.first.get('content'),
+                  style: {
+                    'div': Style(
+                        textAlign: TextAlign.left,
+                        fontSize: FontSize(20),
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Times New Roman',
+                        color: Colors.black87),
+                    'li': Style(margin: EdgeInsets.only(top: 15))
+                  },
+                ),
+              );
+            }),
       ),
     );
   }

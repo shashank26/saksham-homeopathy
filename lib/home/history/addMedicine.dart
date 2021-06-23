@@ -13,13 +13,14 @@ class AddMedicineForm extends StatelessWidget {
   final _dosageController = new TextEditingController(text: '');
   final _endDateController = new TextEditingController(text: '');
   final MedicineInfo _medicineInfo = MedicineInfo();
-  final FirebaseUser user;
+  final User user;
 
   AddMedicineForm(this.user);
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: AppColorPallete.textColor),
@@ -75,7 +76,8 @@ class AddMedicineForm extends StatelessWidget {
                               initialDate: DateTime.now(),
                               firstDate:
                                   DateTime.now().subtract(Duration(days: 365)),
-                              lastDate: DateTime.now().add(Duration(days: 365)));
+                              lastDate:
+                                  DateTime.now().add(Duration(days: 365)));
                           if (dateSelected != null) {
                             this._medicineInfo.datePrescribed =
                                 dateSelected.millisecondsSinceEpoch;
@@ -104,7 +106,8 @@ class AddMedicineForm extends StatelessWidget {
                               initialDate: DateTime.now(),
                               firstDate:
                                   DateTime.now().subtract(Duration(days: 365)),
-                              lastDate: DateTime.now().add(Duration(days: 365)));
+                              lastDate:
+                                  DateTime.now().add(Duration(days: 365)));
                           if (dateSelected != null) {
                             this._medicineInfo.endDate =
                                 dateSelected.millisecondsSinceEpoch;

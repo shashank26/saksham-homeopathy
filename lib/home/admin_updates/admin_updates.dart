@@ -9,6 +9,7 @@ import 'package:saksham_homeopathy/common/custom_dialog.dart';
 import 'package:saksham_homeopathy/common/expandable_text.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/common/network_or_file_image.dart';
+import 'package:saksham_homeopathy/common/photo_preview_dialog.dart';
 import 'package:saksham_homeopathy/home/admin_updates/add_post.dart';
 import 'package:saksham_homeopathy/home/admin_updates/app_drawer.dart';
 import 'package:saksham_homeopathy/home/profile/preview_profile.dart';
@@ -25,7 +26,6 @@ class AdminUpdates extends StatefulWidget {
 }
 
 class _AdminUpdatesState extends State<AdminUpdates> {
-  
   int batch = 1;
   int batchSize = 20;
   final scrollController = new ScrollController();
@@ -69,7 +69,8 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                 child: Text('Delete'),
                 onPressed: () async {
                   showDialog(
-                      context: context, child: CustomDialog('Deleting...'));
+                      context: context,
+                      builder: (_) => CustomDialog('Deleting...'));
                   if (!noe(_post.fileName) && noe(_post.videoThumbnail)) {
                     await FileHandler.instance.deleteCloudFile(_post.fileName);
                   }
@@ -95,21 +96,21 @@ class _AdminUpdatesState extends State<AdminUpdates> {
   _addOrEditPost({DocumentSnapshot post}) async {
     await showDialog(
         context: context,
-        child: MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => UploadStateTemp()),
-          ],
-          child: Scaffold(
-              appBar: AppBar(
-                backgroundColor: AppColorPallete.backgroundColor,
-                iconTheme: IconThemeData(color: AppColorPallete.textColor),
-                title: HeaderText(
-                  'Add Post',
-                  size: 40,
-                ),
-              ),
-              body: AddPost(context, post)),
-        ));
+        builder: (_) => MultiProvider(
+              providers: [
+                ChangeNotifierProvider(create: (_) => UploadStateTemp()),
+              ],
+              child: Scaffold(
+                  appBar: AppBar(
+                    backgroundColor: AppColorPallete.backgroundColor,
+                    iconTheme: IconThemeData(color: AppColorPallete.textColor),
+                    title: HeaderText(
+                      'Add Post',
+                      size: 40,
+                    ),
+                  ),
+                  body: AddPost(context, post)),
+            ));
   }
 
   _previewProfile(ProfileInfo info) {
@@ -185,7 +186,7 @@ class _AdminUpdatesState extends State<AdminUpdates> {
             child: HeaderText(
               "Updates",
               align: TextAlign.left,
-              size: 40,
+              size: 20,
             )),
         actions: [
           if (OTPAuth.isAdmin)
@@ -213,14 +214,14 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                         this.batch * this.batchSize)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data.documents.length > 0) {
-                    this.countOfPosts = snapshot.data.documents.length;
+                  if (snapshot.hasData && snapshot.data.docs.length > 0) {
+                    this.countOfPosts = snapshot.data.docs.length;
                     return ListView.builder(
                       controller: scrollController,
-                      itemCount: snapshot.data.documents.length,
+                      itemCount: snapshot.data.docs.length,
                       itemBuilder: (context, index) {
-                        final _post = AdminPost.fromMap(
-                            snapshot.data.documents[index].data);
+                        final _post =
+                            AdminPost.fromMap(snapshot.data.docs[index].data());
                         return Container(
                           padding: EdgeInsets.all(5),
                           width: MediaQuery.of(context).size.width,
@@ -245,28 +246,8 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                                             ? _getVideoPreview(_post)
                                             : GestureDetector(
                                                 onTap: () {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (context) {
-                                                        return Scaffold(
-                                                          appBar: AppBar(
-                                                            backgroundColor:
-                                                                AppColorPallete
-                                                                    .backgroundColor,
-                                                            iconTheme: IconThemeData(
-                                                                color: AppColorPallete
-                                                                    .textColor),
-                                                          ),
-                                                          body: Container(
-                                                            child: PhotoView(
-                                                                imageProvider: FileImage(FileHandler
-                                                                    .instance
-                                                                    .getRawFile(
-                                                                        fileName:
-                                                                            _post.fileName))),
-                                                          ),
-                                                        );
-                                                      });
+                                                  previewPhoto(
+                                                      context, _post.fileName);
                                                 },
                                                 child: NetworkOrFileImage(
                                                   _post.fileUrl,
@@ -302,14 +283,13 @@ class _AdminUpdatesState extends State<AdminUpdates> {
                                           switch (value) {
                                             case PopupMenuValues.DELETE:
                                               await _deleteConfirmDialog(
-                                                  snapshot.data.documents[index]
+                                                  snapshot.data.docs[index]
                                                       .reference,
                                                   _post);
                                               break;
                                             case PopupMenuValues.EDIT:
                                               await _addOrEditPost(
-                                                post: snapshot
-                                                    .data.documents[index],
+                                                post: snapshot.data.docs[index],
                                               );
                                               break;
                                             default:

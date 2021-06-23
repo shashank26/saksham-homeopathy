@@ -7,8 +7,10 @@ import 'package:saksham_homeopathy/introduction/connecting.dart';
 import 'package:saksham_homeopathy/models/profile_info.dart';
 
 class UserStats extends StatelessWidget {
-  final futureList = Future.wait(
-      [FirestoreCollection.whiteList().getDocuments(), FirestoreCollection.getActiveUsers()]);
+  final futureList = Future.wait([
+    FirestoreCollection.whiteList().get(),
+    FirestoreCollection.getActiveUsers()
+  ]);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,10 @@ class UserStats extends StatelessWidget {
       appBar: AppBar(
         iconTheme: IconThemeData(color: AppColorPallete.textColor),
         backgroundColor: AppColorPallete.backgroundColor,
-        title: HeaderText('User Stats'),
+        title: HeaderText(
+          'User Stats',
+          size: 20,
+        ),
       ),
       body: FutureBuilder<List<QuerySnapshot>>(
         future: futureList,
@@ -24,17 +29,24 @@ class UserStats extends StatelessWidget {
           if (!snapshot.hasData) {
             return ConnectingPage();
           }
-          final activeUsers = snapshot.data[1].documents
-              .map((e) => ProfileInfo.fromMap(e.data))
+          final activeUsers = snapshot.data[1].docs
+              .map((e) => ProfileInfo.fromMap(e.data()))
               .where((element) => element.isAdmin != true)
               .toList();
-          List<Map> whitelist = snapshot.data[0].documents
-              .map((e) => { 'phoneNumber' : e.data['phoneNumber'].toString(), 'documentReference' : e.reference})
+          List<Map> whitelist = snapshot.data[0].docs
+              .map((e) => {
+                    'phoneNumber': e.get('phoneNumber').toString(),
+                    'documentReference': e.reference
+                  })
               .toList();
-          final subscribedActiveUsers = activeUsers
-              .where((element) => whitelist.indexWhere((e) => e['phoneNumber'] == element.phoneNumber) != -1);
-          final unsubscribedActiveUsers = activeUsers
-              .where((element) => whitelist.indexWhere((e) => e['phoneNumber'] == element.phoneNumber) == -1);
+          final subscribedActiveUsers = activeUsers.where((element) =>
+              whitelist
+                  .indexWhere((e) => e['phoneNumber'] == element.phoneNumber) !=
+              -1);
+          final unsubscribedActiveUsers = activeUsers.where((element) =>
+              whitelist
+                  .indexWhere((e) => e['phoneNumber'] == element.phoneNumber) ==
+              -1);
           return ListView(
             children: [
               DecoratedBox(

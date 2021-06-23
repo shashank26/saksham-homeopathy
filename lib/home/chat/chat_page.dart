@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:saksham_homeopathy/common/CTextFormField.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
+import 'package:saksham_homeopathy/common/image_modal_bottom_sheet_dialog.dart';
 import 'package:saksham_homeopathy/common/image_source_bottom_sheet.dart';
 import 'package:saksham_homeopathy/common/message_bubble.dart';
 import 'package:saksham_homeopathy/home/history/historyPage.dart';
@@ -110,10 +111,10 @@ class _ChatPageState extends State<ChatPage> {
     ss = widget.chatService.getChatStream(batch * batchSize).listen((event) {
       setState(() {
         messages = [];
-        messages.addAll(event.documents);
+        messages.addAll(event.docs);
         this.messageSent = messages
             .where(
-                (element) => element.data['sender'] == OTPAuth.currentUser.uid)
+                (element) => element.get('sender') == OTPAuth.currentUser.uid)
             .length;
         if (!widget.whitelisted) {
           if (this.messageSent > 9) {
@@ -137,13 +138,9 @@ class _ChatPageState extends State<ChatPage> {
 
   _uploadImage(bool isNewChat) async {
     ImageSource _imageSource;
-    await showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.transparent,
-        barrierColor: Colors.black.withOpacity(0.5),
-        builder: (context) => ImageSourceBottomSheet((ImageSource imageSource) {
-              _imageSource = imageSource;
-            }));
+    await pickImageSource(context, (ImageSource imageSource) {
+      _imageSource = imageSource;
+    });
     if (_imageSource != null) {
       try {
         setState(() {
@@ -190,7 +187,7 @@ class _ChatPageState extends State<ChatPage> {
   _updateUnreadStatus(MessageInfo info, DocumentReference ref) {
     if (info.isRead == false && info.sender != OTPAuth.currentUser.uid) {
       info.isRead = true;
-      ref.updateData(MessageInfo.toMap(info));
+      ref.update(MessageInfo.toMap(info));
     }
   }
 
@@ -254,7 +251,7 @@ class _ChatPageState extends State<ChatPage> {
                         controller: controller,
                         itemBuilder: (context, index) {
                           MessageInfo info =
-                              MessageInfo.fromMap(messages[index].data);
+                              MessageInfo.fromMap(messages[index].data());
                           _updateUnreadStatus(info, messages[index].reference);
                           return AutoScrollTag(
                             key: ValueKey(index),
@@ -266,7 +263,9 @@ class _ChatPageState extends State<ChatPage> {
                               child: Container(
                                 child: GestureDetector(
                                   onLongPress: () async {
-                                    if (OTPAuth.currentUser.uid == info.sender && widget.whitelisted)
+                                    if (OTPAuth.currentUser.uid ==
+                                            info.sender &&
+                                        widget.whitelisted)
                                       await showModalBottomSheet(
                                           context: context,
                                           builder: (context) {

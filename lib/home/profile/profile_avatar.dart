@@ -23,7 +23,7 @@ class _ProfileAvatarState extends State<ProfileAvatar> {
         stream: ChatService.getUserInfo(widget.uid),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            final _profileInfo = ProfileInfo.fromMap(snapshot.data.data);
+            final _profileInfo = ProfileInfo.fromMap(snapshot.data.data());
             return Row(
               children: <Widget>[
                 CircleAvatar(
@@ -39,18 +39,18 @@ class _ProfileAvatarState extends State<ProfileAvatar> {
                   ),
                 ),
                 if (widget.showName)
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Column(
-                    children: <Widget>[
-                      HeaderText(_profileInfo.displayName, size: 15),
-                      // Text(
-                      //   'Online',
-                      //   style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
-                      // )
-                    ],
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Column(
+                      children: <Widget>[
+                        HeaderText(_profileInfo.displayName, size: 15),
+                        // Text(
+                        //   'Online',
+                        //   style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                        // )
+                      ],
+                    ),
                   ),
-                ),
               ],
             );
           } else {

@@ -21,7 +21,7 @@ class AboutUs extends StatelessWidget {
             child: HeaderText(
               "About Us",
               align: TextAlign.left,
-              size: 40,
+              size: 20,
             )),
       ),
       body: Container(
@@ -36,7 +36,7 @@ class AboutUs extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Html(
-                        data: snapshot.data.documents.first.data['content'],
+                        data: snapshot.data.docs.first.get('content'),
                         style: {
                           'div': Style(
                             fontFamily: 'Times New Roman',

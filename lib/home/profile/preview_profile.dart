@@ -3,6 +3,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:saksham_homeopathy/common/constants.dart';
 import 'package:saksham_homeopathy/common/header_text.dart';
 import 'package:saksham_homeopathy/common/network_or_file_image.dart';
+import 'package:saksham_homeopathy/common/photo_preview_dialog.dart';
 import 'package:saksham_homeopathy/models/profile_info.dart';
 import 'package:saksham_homeopathy/services/file_handler.dart';
 
@@ -34,25 +35,7 @@ class PreviewProfile extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {
                         if (!noe(_profileInfo.fileName))
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return Scaffold(
-                                  appBar: AppBar(
-                                    backgroundColor:
-                                        AppColorPallete.backgroundColor,
-                                    iconTheme: IconThemeData(
-                                        color: AppColorPallete.textColor),
-                                  ),
-                                  body: Container(
-                                    child: PhotoView(
-                                        imageProvider: FileImage(
-                                            FileHandler.instance.getRawFile(
-                                                fileName:
-                                                    _profileInfo.fileName))),
-                                  ),
-                                );
-                              });
+                          previewPhoto(context, _profileInfo.fileName);
                       },
                       child: CircleAvatar(
                         radius: 75,
@@ -94,7 +77,8 @@ class PreviewProfile extends StatelessWidget {
                               fontWeight: FontWeight.w900,
                               decoration: TextDecoration.underline),
                         )),
-                        if (this._profileInfo.isAdmin != null && !this._profileInfo.isAdmin)
+                        if (this._profileInfo.isAdmin != null &&
+                            !this._profileInfo.isAdmin)
                           Container(
                               child: Text(
                             _profileInfo.dateOfBirth != null

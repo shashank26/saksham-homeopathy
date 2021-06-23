@@ -31,11 +31,12 @@ class _UserChatTileState extends State<UserChatTile> {
   }
 
   _openChat() {
-  showDialog(
-      context: context,
-      builder: (BuildContext bc) {
-        return ChatPage(ChatService(widget.uid),  _profileInfo, null, whitelisted : true);
-      });
+    showDialog(
+        context: context,
+        builder: (BuildContext bc) {
+          return ChatPage(ChatService(widget.uid), _profileInfo, null,
+              whitelisted: true);
+        });
   }
 
   @override
@@ -60,7 +61,7 @@ class _UserChatTileState extends State<UserChatTile> {
               stream: ChatService.getUserInfo(widget.uid),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  _profileInfo = ProfileInfo.fromMap(snapshot.data.data);
+                  _profileInfo = ProfileInfo.fromMap(snapshot.data.data());
                   widget._callback(widget.uid, _profileInfo);
                   return Row(
                     mainAxisSize: MainAxisSize.max,
@@ -87,11 +88,16 @@ class _UserChatTileState extends State<UserChatTile> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Text(
-                                noe(_profileInfo.displayName) ? _profileInfo.phoneNumber : _profileInfo.displayName,
-                                style: TextStyle(color: AppColorPallete.textColor, fontSize: 18),
+                                noe(_profileInfo.displayName)
+                                    ? _profileInfo.phoneNumber
+                                    : _profileInfo.displayName,
+                                style: TextStyle(
+                                    color: AppColorPallete.textColor,
+                                    fontSize: 18),
                               ),
-                              LatestMessage(FirestoreCollection.latestMessage(
-                                  widget.uid), widget.uid),
+                              LatestMessage(
+                                  FirestoreCollection.latestMessage(widget.uid),
+                                  widget.uid),
                             ],
                           ),
                         ),
